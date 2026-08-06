@@ -1,0 +1,513 @@
+:root {
+  --bg: #EAE4D8;
+  --surface: #FBF9F5;
+  --ink: #211D19;
+  --ink-muted: #6B655C;
+  --accent: #C1272D;
+  --accent-dark: #8F1B20;
+  --success: #1F7A3D;
+  --danger: #B3261E;
+  --screen-bg: #16231D;
+  --screen-text: #59D98C;
+  --border: #D9D2C3;
+  --font-display: 'Oswald', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px;
+}
+
+h1 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 28px;
+  margin: 0 0 4px;
+}
+
+.langkah > p:first-child {
+  margin: 0 0 24px;
+  color: var(--ink-muted);
+  text-align: center;
+  font-size: 15px;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 320px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.auth-tersembunyi {
+  display: none;
+}
+
+.auth-box p:first-child {
+  margin: 0 0 4px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+
+.auth-tombol {
+  display: flex;
+  gap: 8px;
+}
+
+.auth-tombol button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#btnMasuk {
+  background-color: var(--accent);
+  color: white;
+}
+
+#btnDaftar {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border) !important;
+}
+
+.app-tersembunyi {
+  display: none;
+}
+
+#appContent:not(.app-tersembunyi) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-keluar {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  background-color: var(--accent);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-family: var(--font-display);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.btn-keluar:hover {
+  background-color: var(--accent-dark);
+}
+
+.satuan-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.satuan-btn {
+  border: none;
+  background: none;
+  padding: 5px 16px;
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  color: var(--ink-muted);
+}
+
+.satuan-btn.aktif {
+  background-color: var(--ink);
+  color: var(--surface);
+}
+
+.pengingat-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 10px 14px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.pengingat-box label {
+  margin: 0;
+  font-family: var(--font-body);
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink);
+}
+
+.pengingat-box input[type="time"] {
+  width: auto;
+  padding: 5px 8px;
+}
+
+.pengingat-box button {
+  padding: 6px 14px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.pengingat-box .pesan {
+  width: 100%;
+  margin-top: 0;
+  font-size: 12px;
+}
+
+.nav-langkah {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.nav-btn {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--ink-muted);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.nav-btn.aktif {
+  background-color: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+.langkah {
+  display: none;
+  width: 100%;
+  max-width: 420px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.langkah.aktif {
+  display: flex;
+}
+
+form {
+  width: 100%;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 28px;
+}
+
+label {
+  display: block;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-top: 18px;
+  margin-bottom: 6px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: white;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+button[type="submit"] {
+  margin-top: 24px;
+  width: 100%;
+  padding: 12px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: var(--accent-dark);
+}
+
+.pesan {
+  margin-top: 14px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 14px;
+  min-height: 18px;
+}
+
+.btn-lanjut {
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Layar digital ala timbangan LCD — elemen penanda desain ini */
+.layar {
+  margin-top: 20px;
+  width: 100%;
+  background-color: var(--screen-bg);
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+}
+
+.layar-tersembunyi {
+  display: none;
+}
+
+.layar-angka {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--screen-text);
+  line-height: 1;
+}
+
+.layar-label {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+  color: var(--screen-text);
+  opacity: 0.75;
+}
+
+h2 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 15px;
+  color: var(--ink-muted);
+  margin-top: 32px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+#daftarCatatan {
+  width: 100%;
+}
+
+.log-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.log-tanggal {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.log-detail {
+  font-size: 13px;
+  text-align: right;
+}
+
+.grafik {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 180px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 28px 12px 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  position: relative;
+}
+
+.bar {
+  flex: 1;
+  background-color: var(--ink-muted);
+  border-radius: 3px 3px 0 0;
+  min-width: 18px;
+  position: relative;
+  transition: height 0.6s ease;
+}
+
+.bar-turun {
+  background-color: var(--success);
+}
+
+.bar-naik {
+  background-color: var(--accent);
+}
+
+.bar span {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.grafik-label {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.grafik-label span {
+  flex: 1;
+  min-width: 18px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-muted);
+}
+
+.garis-target {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  border-top: 2px dashed var(--ink);
+  height: 0;
+}
+
+.garis-target span {
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink);
+  background-color: var(--surface);
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.ringkasan-tersembunyi {
+  display: none;
+}
+
+#ringkasanIsi {
+  width: 100%;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.stat-kotak {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 6px;
+  text-align: center;
+}
+
+.stat-angka {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.stat-label {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 9px;
+  color: var(--ink-muted);
+}
