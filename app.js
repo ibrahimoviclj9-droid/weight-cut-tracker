@@ -140,6 +140,7 @@ semuaTombolSatuan.forEach(function (btn) {
 const inputJamPengingat = document.getElementById("jamPengingat");
 const btnAktifkanPengingat = document.getElementById("btnAktifkanPengingat");
 const btnTesPengingat = document.getElementById("btnTesPengingat");
+const btnAktifkanPush = document.getElementById("btnAktifkanPush");
 const statusPengingat = document.getElementById("statusPengingat");
 
 btnTesPengingat.addEventListener("click", function () {
@@ -163,6 +164,71 @@ btnTesPengingat.addEventListener("click", function () {
     statusPengingat.textContent = "Notifikasi tes terkirim. Muncul di layar kamu nggak?";
     statusPengingat.style.color = "#1F7A3D";
   });
+});
+
+/* ---------- Web Push (versi yang jalan walau tab ditutup) ---------- */
+
+const VAPID_PUBLIC_KEY = "BE8r2yQcvwzjbL9vZ_5SjH7N4loU4AXBhv0zns1HcaVMnhhFqmhbi_qP5bFreCSes1Vs5BNAXfbYlZcRBoVGluc";
+
+// Web Push butuh applicationServerKey dalam bentuk Uint8Array,
+// bukan string — ini fungsi konversinya.
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+btnAktifkanPush.addEventListener("click", async function () {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    statusPengingat.textContent = "Browser kamu nggak mendukung push notification.";
+    statusPengingat.style.color = "red";
+    return;
+  }
+
+  try {
+    statusPengingat.textContent = "Mendaftarkan...";
+    statusPengingat.style.color = "";
+
+    const registration = await navigator.serviceWorker.register("sw.js");
+
+    const izin = await Notification.requestPermission();
+    if (izin !== "granted") {
+      statusPengingat.textContent = "Izin notifikasi ditolak.";
+      statusPengingat.style.color = "red";
+      return;
+    }
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    });
+
+    const subJson = subscription.toJSON();
+
+    const { error } = await supabaseClient.from("push_subscriptions").insert({
+      endpoint: subJson.endpoint,
+      p256dh: subJson.keys.p256dh,
+      auth: subJson.keys.auth,
+      user_id: userSaatIni,
+    });
+
+    if (error) {
+      statusPengingat.textContent = "Gagal simpan subscription: " + error.message;
+      statusPengingat.style.color = "red";
+      return;
+    }
+
+    statusPengingat.textContent = "Push notification aktif! Lanjut ke Bagian 2 buat nyoba kirim.";
+    statusPengingat.style.color = "#1F7A3D";
+  } catch (err) {
+    statusPengingat.textContent = "Gagal aktifin push: " + err.message;
+    statusPengingat.style.color = "red";
+  }
 });
 
 btnAktifkanPengingat.addEventListener("click", function () {
