@@ -135,38 +135,23 @@ semuaTombolSatuan.forEach(function (btn) {
   });
 });
 
-/* ---------- Pengingat harian ---------- */
+/* ---------- Notifikasi Push ---------- */
 
-const inputJamPengingat = document.getElementById("jamPengingat");
-const btnAktifkanPengingat = document.getElementById("btnAktifkanPengingat");
-const btnTesPengingat = document.getElementById("btnTesPengingat");
 const btnAktifkanPush = document.getElementById("btnAktifkanPush");
+const inputJamPengingat = document.getElementById("jamPengingat");
+
+// Server jalan pakai jam UTC, sedangkan kamu milih jam pakai waktu lokal
+// (WIB, dst) — ini konversinya, biar jam yang tersimpan udah "pas" buat
+// dibandingin server nanti.
+function konversiJamKeUTC(jamLokal) {
+  const bagian = jamLokal.split(":").map(Number);
+  const d = new Date();
+  d.setHours(bagian[0], bagian[1], 0, 0);
+  const jamUTC = String(d.getUTCHours()).padStart(2, "0");
+  const menitUTC = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${jamUTC}:${menitUTC}`;
+}
 const statusPengingat = document.getElementById("statusPengingat");
-
-btnTesPengingat.addEventListener("click", function () {
-  if (!("Notification" in window)) {
-    statusPengingat.textContent = "Browser kamu nggak mendukung notifikasi.";
-    statusPengingat.style.color = "red";
-    return;
-  }
-
-  Notification.requestPermission().then(function (izin) {
-    if (izin !== "granted") {
-      statusPengingat.textContent = "Izin notifikasi belum aktif. Klik ikon gembok/info di address bar browser, cari 'Notifications', pastikan di-Allow.";
-      statusPengingat.style.color = "red";
-      return;
-    }
-
-    new Notification("Weight Cut Tracker", {
-      body: "Ini notifikasi tes — kalau ini muncul, pengingat kamu bakal jalan!",
-    });
-
-    statusPengingat.textContent = "Notifikasi tes terkirim. Muncul di layar kamu nggak?";
-    statusPengingat.style.color = "#1F7A3D";
-  });
-});
-
-/* ---------- Web Push (versi yang jalan walau tab ditutup) ---------- */
 
 const VAPID_PUBLIC_KEY = "BE8r2yQcvwzjbL9vZ_5SjH7N4loU4AXBhv0zns1HcaVMnhhFqmhbi_qP5bFreCSes1Vs5BNAXfbYlZcRBoVGluc";
 
@@ -183,9 +168,18 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
+// Satu tombol ini ngerjain semuanya: daftar Service Worker, minta izin,
+// subscribe ke push, simpan ke Supabase, LALU langsung minta server
+// kirim 1 notifikasi konfirmasi — jadi aktivasi + tes jadi satu langkah.
 btnAktifkanPush.addEventListener("click", async function () {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
     statusPengingat.textContent = "Browser kamu nggak mendukung push notification.";
+    statusPengingat.style.color = "red";
+    return;
+  }
+
+  if (inputJamPengingat.value === "") {
+    statusPengingat.textContent = "Pilih jam pengingat dulu ya.";
     statusPengingat.style.color = "red";
     return;
   }
@@ -209,12 +203,14 @@ btnAktifkanPush.addEventListener("click", async function () {
     });
 
     const subJson = subscription.toJSON();
+    const jamUTC = konversiJamKeUTC(inputJamPengingat.value);
 
     const { error } = await supabaseClient.from("push_subscriptions").insert({
       endpoint: subJson.endpoint,
       p256dh: subJson.keys.p256dh,
       auth: subJson.keys.auth,
       user_id: userSaatIni,
+      jam_pengingat: jamUTC,
     });
 
     if (error) {
@@ -223,57 +219,22 @@ btnAktifkanPush.addEventListener("click", async function () {
       return;
     }
 
-    statusPengingat.textContent = "Push notification aktif! Lanjut ke Bagian 2 buat nyoba kirim.";
-    statusPengingat.style.color = "#1F7A3D";
-  } catch (err) {
-    statusPengingat.textContent = "Gagal aktifin push: " + err.message;
-    statusPengingat.style.color = "red";
-  }
-});
+    statusPengingat.textContent = "Aktif! Ngirim notifikasi konfirmasi...";
 
-btnAktifkanPengingat.addEventListener("click", function () {
-  if (!("Notification" in window)) {
-    statusPengingat.textContent = "Browser kamu nggak mendukung notifikasi.";
-    statusPengingat.style.color = "red";
-    return;
-  }
+    const { error: errorKirim } = await supabaseClient.functions.invoke("kirim-push");
 
-  if (inputJamPengingat.value === "") {
-    statusPengingat.textContent = "Pilih jam pengingat dulu.";
-    statusPengingat.style.color = "red";
-    return;
-  }
-
-  Notification.requestPermission().then(function (izin) {
-    if (izin !== "granted") {
-      statusPengingat.textContent = "Izin notifikasi ditolak. Kamu bisa ubah lagi lewat setting browser.";
+    if (errorKirim) {
+      statusPengingat.textContent = "Notifikasi aktif, tapi tes kirim gagal: " + errorKirim.message;
       statusPengingat.style.color = "red";
       return;
     }
 
-    const bagianJam = inputJamPengingat.value.split(":").map(Number);
-    const jam = bagianJam[0];
-    const menit = bagianJam[1];
-
-    const sekarang = new Date();
-    const waktuPengingat = new Date();
-    waktuPengingat.setHours(jam, menit, 0, 0);
-
-    if (waktuPengingat <= sekarang) {
-      waktuPengingat.setDate(waktuPengingat.getDate() + 1);
-    }
-
-    const selisihMs = waktuPengingat - sekarang;
-
-    setTimeout(function () {
-      new Notification("Weight Cut Tracker", {
-        body: "Waktunya catat progres weight cut kamu hari ini! 💪",
-      });
-    }, selisihMs);
-
-    statusPengingat.textContent = `Pengingat aktif jam ${inputJamPengingat.value} (selama halaman ini masih kebuka).`;
+    statusPengingat.textContent = `Notifikasi aktif! Kamu bakal diingetin tiap jam ${inputJamPengingat.value}. Cek notifikasi konfirmasinya sekarang.`;
     statusPengingat.style.color = "#1F7A3D";
-  });
+  } catch (err) {
+    statusPengingat.textContent = "Gagal aktifin notifikasi: " + err.message;
+    statusPengingat.style.color = "red";
+  }
 });
 
 /* ---------- Navigasi antar langkah ---------- */
