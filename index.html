@@ -4,6 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weight Cut Tracker</title>
+  <script>
+    // Ini dijalanin PALING AWAL, sebelum CSS/halaman digambar, biar tema
+    // gelap/terang langsung pas dari awal — nggak ada kedipan "putih dulu
+    // baru gelap". Urutan prioritas: pilihan tersimpan user > preferensi
+    // sistem (HP/laptop-nya emang di-set dark mode) > default terang.
+    (function () {
+      var temaTersimpan = localStorage.getItem("temaWCT");
+      var sistemMintaGelap = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (temaTersimpan === "gelap" || (!temaTersimpan && sistemMintaGelap)) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -11,7 +24,12 @@
 </head>
 <body>
 
-  <h1>Weight Cut Tracker</h1>
+  <button type="button" id="btnModeGelap" class="btn-mode-gelap" aria-label="Ganti ke mode gelap">🌙</button>
+
+  <header class="header-utama">
+    <h1>Weight Cut Tracker</h1>
+    <p class="eyebrow">Pelacak Weight Cut — Atlet &amp; Coach Combat Sports</p>
+  </header>
 
   <div id="authBox" class="auth-box">
     <p>Masuk atau daftar dulu buat mulai tracking.</p>

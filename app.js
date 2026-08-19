@@ -5,6 +5,50 @@ const SUPABASE_KEY = "sb_publishable_EMCUNoKr1o7Cbvc0_SNQhA_2HDK4ZUu";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* ---------- Helper pesan sukses/error ---------- */
+
+// Dulu warna pesan (merah/ijo) di-hardcode langsung lewat style.color di
+// tiap tempat. Masalahnya warna yang di-hardcode gitu nggak ikut berubah
+// pas mode gelap aktif (ijo tua jadi susah kebaca di background gelap).
+// Sekarang pakai kelas CSS (.pesan-error / .pesan-sukses) yang warnanya
+// diatur lewat variabel tema di style.css, jadi otomatis nyesuain.
+function tampilkanPesan(elemen, teks, jenis) {
+  // jenis: "error", "sukses", atau "" (netral, misal pas lagi nyimpen)
+  elemen.textContent = teks;
+  elemen.classList.remove("pesan-error", "pesan-sukses");
+  if (jenis === "error") elemen.classList.add("pesan-error");
+  if (jenis === "sukses") elemen.classList.add("pesan-sukses");
+}
+
+/* ---------- Mode Gelap/Terang ---------- */
+
+const btnModeGelap = document.getElementById("btnModeGelap");
+
+// Samain tampilan ikon tombol sama tema yang lagi aktif sekarang.
+// Dipanggil pas load (buat nyesuain kalau tema gelap udah aktif dari
+// script di <head>) dan tiap kali tombolnya diklik.
+function perbaruiIkonMode() {
+  const modeGelapAktif = document.documentElement.getAttribute("data-theme") === "dark";
+  btnModeGelap.textContent = modeGelapAktif ? "☀️" : "🌙";
+  btnModeGelap.setAttribute("aria-label", modeGelapAktif ? "Ganti ke mode terang" : "Ganti ke mode gelap");
+}
+
+btnModeGelap.addEventListener("click", function () {
+  const modeGelapAktif = document.documentElement.getAttribute("data-theme") === "dark";
+
+  if (modeGelapAktif) {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.setItem("temaWCT", "terang");
+  } else {
+    document.documentElement.setAttribute("data-theme", "dark");
+    localStorage.setItem("temaWCT", "gelap");
+  }
+
+  perbaruiIkonMode();
+});
+
+perbaruiIkonMode();
+
 /* ---------- Autentikasi ---------- */
 
 const authBox = document.getElementById("authBox");
@@ -18,13 +62,11 @@ const btnKeluar = document.getElementById("btnKeluar");
 
 btnDaftar.addEventListener("click", async function () {
   if (authEmail.value === "" || authPassword.value === "") {
-    pesanAuth.textContent = "Isi email dan password dulu ya.";
-    pesanAuth.style.color = "red";
+    tampilkanPesan(pesanAuth, "Isi email dan password dulu ya.", "error");
     return;
   }
 
-  pesanAuth.textContent = "Mendaftarkan...";
-  pesanAuth.style.color = "";
+  tampilkanPesan(pesanAuth, "Mendaftarkan...", "");
 
   const { error } = await supabaseClient.auth.signUp({
     email: authEmail.value,
@@ -32,24 +74,20 @@ btnDaftar.addEventListener("click", async function () {
   });
 
   if (error) {
-    pesanAuth.textContent = "Gagal daftar: " + error.message;
-    pesanAuth.style.color = "red";
+    tampilkanPesan(pesanAuth, "Gagal daftar: " + error.message, "error");
     return;
   }
 
-  pesanAuth.textContent = "Berhasil daftar! Cek email kamu buat konfirmasi, baru bisa masuk.";
-  pesanAuth.style.color = "#1F7A3D";
+  tampilkanPesan(pesanAuth, "Berhasil daftar! Cek email kamu buat konfirmasi, baru bisa masuk.", "sukses");
 });
 
 btnMasuk.addEventListener("click", async function () {
   if (authEmail.value === "" || authPassword.value === "") {
-    pesanAuth.textContent = "Isi email dan password dulu ya.";
-    pesanAuth.style.color = "red";
+    tampilkanPesan(pesanAuth, "Isi email dan password dulu ya.", "error");
     return;
   }
 
-  pesanAuth.textContent = "Masuk...";
-  pesanAuth.style.color = "";
+  tampilkanPesan(pesanAuth, "Masuk...", "");
 
   const { error } = await supabaseClient.auth.signInWithPassword({
     email: authEmail.value,
@@ -57,8 +95,7 @@ btnMasuk.addEventListener("click", async function () {
   });
 
   if (error) {
-    pesanAuth.textContent = "Gagal masuk: " + error.message;
-    pesanAuth.style.color = "red";
+    tampilkanPesan(pesanAuth, "Gagal masuk: " + error.message, "error");
     return;
   }
 });
@@ -76,7 +113,7 @@ supabaseClient.auth.onAuthStateChange(function (event, session) {
     appContent.classList.remove("app-tersembunyi");
     authEmail.value = "";
     authPassword.value = "";
-    pesanAuth.textContent = "";
+    tampilkanPesan(pesanAuth, "", "");
     muatSemuaData();
   } else {
     userSaatIni = null;
@@ -173,27 +210,23 @@ function urlBase64ToUint8Array(base64String) {
 // kirim 1 notifikasi konfirmasi — jadi aktivasi + tes jadi satu langkah.
 btnAktifkanPush.addEventListener("click", async function () {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-    statusPengingat.textContent = "Browser kamu nggak mendukung push notification.";
-    statusPengingat.style.color = "red";
+    tampilkanPesan(statusPengingat, "Browser kamu nggak mendukung push notification.", "error");
     return;
   }
 
   if (inputJamPengingat.value === "") {
-    statusPengingat.textContent = "Pilih jam pengingat dulu ya.";
-    statusPengingat.style.color = "red";
+    tampilkanPesan(statusPengingat, "Pilih jam pengingat dulu ya.", "error");
     return;
   }
 
   try {
-    statusPengingat.textContent = "Mendaftarkan...";
-    statusPengingat.style.color = "";
+    tampilkanPesan(statusPengingat, "Mendaftarkan...", "");
 
     const registration = await navigator.serviceWorker.register("sw.js");
 
     const izin = await Notification.requestPermission();
     if (izin !== "granted") {
-      statusPengingat.textContent = "Izin notifikasi ditolak.";
-      statusPengingat.style.color = "red";
+      tampilkanPesan(statusPengingat, "Izin notifikasi ditolak.", "error");
       return;
     }
 
@@ -214,26 +247,22 @@ btnAktifkanPush.addEventListener("click", async function () {
     });
 
     if (error) {
-      statusPengingat.textContent = "Gagal simpan subscription: " + error.message;
-      statusPengingat.style.color = "red";
+      tampilkanPesan(statusPengingat, "Gagal simpan subscription: " + error.message, "error");
       return;
     }
 
-    statusPengingat.textContent = "Aktif! Ngirim notifikasi konfirmasi...";
+    tampilkanPesan(statusPengingat, "Aktif! Ngirim notifikasi konfirmasi...", "");
 
     const { error: errorKirim } = await supabaseClient.functions.invoke("kirim-push");
 
     if (errorKirim) {
-      statusPengingat.textContent = "Notifikasi aktif, tapi tes kirim gagal: " + errorKirim.message;
-      statusPengingat.style.color = "red";
+      tampilkanPesan(statusPengingat, "Notifikasi aktif, tapi tes kirim gagal: " + errorKirim.message, "error");
       return;
     }
 
-    statusPengingat.textContent = `Notifikasi aktif! Kamu bakal diingetin tiap jam ${inputJamPengingat.value}. Cek notifikasi konfirmasinya sekarang.`;
-    statusPengingat.style.color = "#1F7A3D";
+    tampilkanPesan(statusPengingat, `Notifikasi aktif! Kamu bakal diingetin tiap jam ${inputJamPengingat.value}. Cek notifikasi konfirmasinya sekarang.`, "sukses");
   } catch (err) {
-    statusPengingat.textContent = "Gagal aktifin notifikasi: " + err.message;
-    statusPengingat.style.color = "red";
+    tampilkanPesan(statusPengingat, "Gagal aktifin notifikasi: " + err.message, "error");
   }
 });
 
@@ -283,40 +312,34 @@ formProfil.addEventListener("submit", async function (event) {
   const beratRaw = document.getElementById("berat-sekarang").value;
 
   if (nama === "") {
-    pesanProfil.textContent = "Nama wajib diisi dulu ya.";
-    pesanProfil.style.color = "red";
+    tampilkanPesan(pesanProfil, "Nama wajib diisi dulu ya.", "error");
     return;
   }
 
   if (beratRaw === "") {
-    pesanProfil.textContent = "Berat badan harus diisi dengan angka yang valid.";
-    pesanProfil.style.color = "red";
+    tampilkanPesan(pesanProfil, "Berat badan harus diisi dengan angka yang valid.", "error");
     return;
   }
 
   const beratKg = bacaBeratKg(beratRaw);
 
   if (beratKg <= 0) {
-    pesanProfil.textContent = "Berat badan harus diisi dengan angka yang valid.";
-    pesanProfil.style.color = "red";
+    tampilkanPesan(pesanProfil, "Berat badan harus diisi dengan angka yang valid.", "error");
     return;
   }
 
-  pesanProfil.textContent = "Nyimpen...";
-  pesanProfil.style.color = "";
+  tampilkanPesan(pesanProfil, "Nyimpen...", "");
 
   const { error } = await supabaseClient
     .from("profil")
     .insert({ nama: nama, peran: peran, berat_awal: beratKg, user_id: userSaatIni });
 
   if (error) {
-    pesanProfil.textContent = "Gagal nyimpen ke database: " + error.message;
-    pesanProfil.style.color = "red";
+    tampilkanPesan(pesanProfil, "Gagal nyimpen ke database: " + error.message, "error");
     return;
   }
 
-  pesanProfil.textContent = `Profil untuk ${nama} berhasil dibuat! Berat awal: ${formatBerat(beratKg)}.`;
-  pesanProfil.style.color = "#1F7A3D";
+  tampilkanPesan(pesanProfil, `Profil untuk ${nama} berhasil dibuat! Berat awal: ${formatBerat(beratKg)}.`, "sukses");
 });
 
 async function muatProfilTerbaru() {
@@ -332,7 +355,7 @@ async function muatProfilTerbaru() {
   document.getElementById("nama").value = "";
   document.getElementById("peran").value = "atlet";
   document.getElementById("berat-sekarang").value = "";
-  pesanProfil.textContent = "";
+  tampilkanPesan(pesanProfil, "", "");
 
   if (error || !data || data.length === 0) return;
 
@@ -341,8 +364,7 @@ async function muatProfilTerbaru() {
   document.getElementById("peran").value = profil.peran;
   document.getElementById("berat-sekarang").value = profil.berat_awal;
 
-  pesanProfil.textContent = `Selamat datang kembali, ${profil.nama}!`;
-  pesanProfil.style.color = "#1F7A3D";
+  tampilkanPesan(pesanProfil, `Selamat datang kembali, ${profil.nama}!`, "sukses");
 }
 
 /* ---------- Form Target ---------- */
@@ -359,28 +381,24 @@ formTarget.addEventListener("submit", async function (event) {
   const tanggalWeighin = document.getElementById("tanggal-weighin").value;
 
   if (targetBeratRaw === "") {
-    pesanTarget.textContent = "Target berat harus diisi angka yang valid.";
-    pesanTarget.style.color = "red";
+    tampilkanPesan(pesanTarget, "Target berat harus diisi angka yang valid.", "error");
     return;
   }
 
   const targetBeratKg = bacaBeratKg(targetBeratRaw);
 
   if (targetBeratKg <= 0) {
-    pesanTarget.textContent = "Target berat harus diisi angka yang valid.";
-    pesanTarget.style.color = "red";
+    tampilkanPesan(pesanTarget, "Target berat harus diisi angka yang valid.", "error");
     return;
   }
 
   if (targetBeratKg < 45) {
-    pesanTarget.textContent = "⚠️ Target ini berisiko tinggi buat kesehatan. Sebaiknya diskusikan dulu sama dokter/nutrisionis olahraga sebelum lanjut.";
-    pesanTarget.style.color = "red";
+    tampilkanPesan(pesanTarget, "⚠️ Target ini berisiko tinggi buat kesehatan. Sebaiknya diskusikan dulu sama dokter/nutrisionis olahraga sebelum lanjut.", "error");
     return;
   }
 
   if (tanggalWeighin === "") {
-    pesanTarget.textContent = "Tanggal weigh-in wajib diisi.";
-    pesanTarget.style.color = "red";
+    tampilkanPesan(pesanTarget, "Tanggal weigh-in wajib diisi.", "error");
     return;
   }
 
@@ -390,26 +408,22 @@ formTarget.addEventListener("submit", async function (event) {
   const selisihHari = Math.ceil(selisihMs / (1000 * 60 * 60 * 24));
 
   if (selisihHari < 0) {
-    pesanTarget.textContent = "Tanggal weigh-in itu udah lewat, coba cek lagi tanggalnya.";
-    pesanTarget.style.color = "red";
+    tampilkanPesan(pesanTarget, "Tanggal weigh-in itu udah lewat, coba cek lagi tanggalnya.", "error");
     return;
   }
 
-  pesanTarget.textContent = "Nyimpen...";
-  pesanTarget.style.color = "";
+  tampilkanPesan(pesanTarget, "Nyimpen...", "");
 
   const { error } = await supabaseClient
     .from("target")
     .insert({ target_berat: targetBeratKg, tanggal_weighin: tanggalWeighin, user_id: userSaatIni });
 
   if (error) {
-    pesanTarget.textContent = "Gagal nyimpen ke database: " + error.message;
-    pesanTarget.style.color = "red";
+    tampilkanPesan(pesanTarget, "Gagal nyimpen ke database: " + error.message, "error");
     return;
   }
 
-  pesanTarget.textContent = `Target ${formatBerat(targetBeratKg)} tersimpan.`;
-  pesanTarget.style.color = "#1F7A3D";
+  tampilkanPesan(pesanTarget, `Target ${formatBerat(targetBeratKg)} tersimpan.`, "sukses");
 
   angkaHari.textContent = selisihHari;
   layarTarget.classList.remove("layar-tersembunyi");
@@ -429,7 +443,7 @@ async function muatTargetTerbaru() {
   // akun sebelumnya.
   document.getElementById("target-berat").value = "";
   document.getElementById("tanggal-weighin").value = "";
-  pesanTarget.textContent = "";
+  tampilkanPesan(pesanTarget, "", "");
   layarTarget.classList.add("layar-tersembunyi");
 
   if (error || !data || data.length === 0) return;
@@ -469,8 +483,7 @@ async function muatDataDariSupabase() {
     .order("tanggal", { ascending: true });
 
   if (error) {
-    pesanHarian.textContent = "Gagal ambil data dari database: " + error.message;
-    pesanHarian.style.color = "red";
+    tampilkanPesan(pesanHarian, "Gagal ambil data dari database: " + error.message, "error");
     return;
   }
 
@@ -496,21 +509,18 @@ formHarian.addEventListener("submit", async function (event) {
   const nutrisi = document.getElementById("nutrisi").value;
 
   if (tanggal === "" || beratRaw === "") {
-    pesanHarian.textContent = "Tanggal dan berat badan wajib diisi dengan benar.";
-    pesanHarian.style.color = "red";
+    tampilkanPesan(pesanHarian, "Tanggal dan berat badan wajib diisi dengan benar.", "error");
     return;
   }
 
   const beratKg = bacaBeratKg(beratRaw);
 
   if (beratKg <= 0) {
-    pesanHarian.textContent = "Tanggal dan berat badan wajib diisi dengan benar.";
-    pesanHarian.style.color = "red";
+    tampilkanPesan(pesanHarian, "Tanggal dan berat badan wajib diisi dengan benar.", "error");
     return;
   }
 
-  pesanHarian.textContent = "Nyimpen...";
-  pesanHarian.style.color = "";
+  tampilkanPesan(pesanHarian, "Nyimpen...", "");
 
   const { data, error } = await supabaseClient
     .from("catatan_harian")
@@ -525,15 +535,13 @@ formHarian.addEventListener("submit", async function (event) {
     .select();
 
   if (error) {
-    pesanHarian.textContent = "Gagal nyimpen ke database: " + error.message;
-    pesanHarian.style.color = "red";
+    tampilkanPesan(pesanHarian, "Gagal nyimpen ke database: " + error.message, "error");
     return;
   }
 
   catatanHarian.push(data[0]);
 
-  pesanHarian.textContent = "Catatan tersimpan ke database!";
-  pesanHarian.style.color = "#1F7A3D";
+  tampilkanPesan(pesanHarian, "Catatan tersimpan ke database!", "sukses");
 
   tampilkanCatatan();
   gambarGrafik();
