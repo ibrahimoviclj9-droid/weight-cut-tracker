@@ -548,6 +548,51 @@ button[type="submit"]:active {
   display: none;
 }
 
+.badge-tercapai {
+  margin-top: 14px;
+  width: 100%;
+  text-align: center;
+  padding: 12px 16px;
+  background-color: var(--success);
+  color: white;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.badge-tersembunyi {
+  display: none;
+}
+
+.btn-periode-baru {
+  margin-top: 16px;
+  width: 100%;
+  min-height: 44px;
+  background-color: transparent;
+  border: 1px solid var(--ink-muted);
+  border-radius: 8px;
+  color: var(--ink-muted);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-periode-baru:hover {
+  background-color: var(--surface-hover);
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.btn-periode-baru:active {
+  transform: translateY(1px);
+}
+
 .layar-angka {
   display: block;
   font-family: var(--font-mono);
@@ -615,6 +660,7 @@ h2 {
 .grafik {
   display: flex;
   align-items: flex-end;
+  justify-content: center;
   gap: 6px;
   height: 160px;
   width: 100%;
@@ -628,8 +674,9 @@ h2 {
 
 .bar {
   flex: 1;
+  max-width: 56px;
   background-color: var(--ink-muted);
-  border-radius: 3px 3px 0 0;
+  border-radius: 4px 4px 0 0;
   min-width: 14px;
   position: relative;
   transition: height 0.6s ease;
@@ -657,6 +704,7 @@ h2 {
 
 .grafik-label {
   display: flex;
+  justify-content: center;
   gap: 6px;
   width: 100%;
   margin-top: 6px;
@@ -664,6 +712,7 @@ h2 {
 
 .grafik-label span {
   flex: 1;
+  max-width: 56px;
   min-width: 14px;
   text-align: center;
   font-family: var(--font-mono);
@@ -681,13 +730,16 @@ h2 {
 
 .garis-target span {
   position: absolute;
-  right: 0;
+  left: 0;
   top: -18px;
   font-family: var(--font-mono);
   font-size: 9.5px;
+  font-weight: 700;
   color: var(--ink);
   background-color: var(--surface);
-  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
   white-space: nowrap;
 }
 

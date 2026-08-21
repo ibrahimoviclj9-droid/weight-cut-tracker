@@ -373,6 +373,8 @@ const formTarget = document.getElementById("targetForm");
 const pesanTarget = document.getElementById("pesanTarget");
 const layarTarget = document.getElementById("layarTarget");
 const angkaHari = document.getElementById("angkaHari");
+const badgeTercapai = document.getElementById("badgeTercapai");
+const btnPeriodeBaru = document.getElementById("btnPeriodeBaru");
 
 formTarget.addEventListener("submit", async function (event) {
   event.preventDefault();
@@ -414,22 +416,69 @@ formTarget.addEventListener("submit", async function (event) {
 
   tampilkanPesan(pesanTarget, "Nyimpen...", "");
 
-  const { error } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("target")
-    .insert({ target_berat: targetBeratKg, tanggal_weighin: tanggalWeighin, user_id: userSaatIni });
+    .insert({ target_berat: targetBeratKg, tanggal_weighin: tanggalWeighin, user_id: userSaatIni })
+    .select();
 
   if (error) {
     tampilkanPesan(pesanTarget, "Gagal nyimpen ke database: " + error.message, "error");
     return;
   }
 
+  idTargetAktif = data[0].id;
+
   tampilkanPesan(pesanTarget, `Target ${formatBerat(targetBeratKg)} tersimpan.`, "sukses");
 
   angkaHari.textContent = selisihHari;
   layarTarget.classList.remove("layar-tersembunyi");
 
+  perbaruiStatusTargetTercapai();
   gambarGrafik();
 });
+
+// Tombol ini nggak langsung nyimpen apa-apa ke database — dia cuma
+// ngosongin form Target biar siap diisi target BARU. Periode baru itu
+// baru beneran "mulai" pas kamu submit target barunya. Data periode
+// yang sekarang tetep utuh aman di database, cuma nanti nggak ikut
+// ditampilin lagi di grafik/ringkasan/badge begitu ada periode baru.
+btnPeriodeBaru.addEventListener("click", function () {
+  const konfirmasi = confirm(
+    "Mulai periode/cut baru?\n\nData & grafik periode SEKARANG tetap aman tersimpan. Form Target bakal dikosongin, dan grafik bakal mulai dari nol lagi buat periode barunya.\n\nLanjut?"
+  );
+
+  if (!konfirmasi) return;
+
+  document.getElementById("target-berat").value = "";
+  document.getElementById("tanggal-weighin").value = "";
+  tampilkanPesan(pesanTarget, "", "");
+  layarTarget.classList.add("layar-tersembunyi");
+  badgeTercapai.classList.add("badge-tersembunyi");
+  document.getElementById("target-berat").focus();
+});
+
+// Badge "Target Tercapai" dicek dengan bandingin berat CATATAN HARIAN
+// yang paling baru sama target berat. Dipanggil ulang tiap kali data
+// target ATAU data harian berubah (submit form, atau pas load awal),
+// soalnya dua-duanya bisa mempengaruhi status tercapai/belumnya.
+function perbaruiStatusTargetTercapai() {
+  const targetBeratRaw = document.getElementById("target-berat").value;
+  const data = catatanPeriodeAktif();
+
+  if (targetBeratRaw === "" || data.length === 0) {
+    badgeTercapai.classList.add("badge-tersembunyi");
+    return;
+  }
+
+  const targetBeratKg = bacaBeratKg(targetBeratRaw);
+  const beratTerakhir = Number(data[data.length - 1].berat);
+
+  if (beratTerakhir <= targetBeratKg) {
+    badgeTercapai.classList.remove("badge-tersembunyi");
+  } else {
+    badgeTercapai.classList.add("badge-tersembunyi");
+  }
+}
 
 async function muatTargetTerbaru() {
   const { data, error } = await supabaseClient
@@ -445,12 +494,15 @@ async function muatTargetTerbaru() {
   document.getElementById("tanggal-weighin").value = "";
   tampilkanPesan(pesanTarget, "", "");
   layarTarget.classList.add("layar-tersembunyi");
+  badgeTercapai.classList.add("badge-tersembunyi");
+  idTargetAktif = null;
 
   if (error || !data || data.length === 0) return;
 
   const target = data[0];
   document.getElementById("target-berat").value = target.target_berat;
   document.getElementById("tanggal-weighin").value = target.tanggal_weighin;
+  idTargetAktif = target.id;
 
   const hariIni = new Date();
   const tanggalTarget = new Date(target.tanggal_weighin);
@@ -475,6 +527,21 @@ const grafikTanggal = document.getElementById("grafikTanggal");
 // nanti nilainya diganti total sama data yang diambil dari Supabase.
 let catatanHarian = [];
 
+// ID dari target yang lagi AKTIF sekarang (target paling baru). Dipakai
+// buat "menandai" tiap catatan harian itu punya periode/cut yang mana,
+// biar grafik/ringkasan/badge nggak nyampur data dari periode lama.
+let idTargetAktif = null;
+
+// Cuma ambil catatan harian yang tanda periode-nya (target_id) SAMA
+// dengan periode yang lagi aktif sekarang. Data dari periode lama tetep
+// aman tersimpan di database, cuma nggak ikut ditampilin di sini.
+function catatanPeriodeAktif() {
+  if (idTargetAktif === null) return [];
+  return catatanHarian.filter(function (c) {
+    return c.target_id === idTargetAktif;
+  });
+}
+
 async function muatDataDariSupabase() {
   const { data, error } = await supabaseClient
     .from("catatan_harian")
@@ -490,6 +557,7 @@ async function muatDataDariSupabase() {
   catatanHarian = data;
   tampilkanCatatan();
   gambarGrafik();
+  perbaruiStatusTargetTercapai();
 }
 
 async function muatSemuaData() {
@@ -531,6 +599,7 @@ formHarian.addEventListener("submit", async function (event) {
       latihan: latihan,
       nutrisi: nutrisi,
       user_id: userSaatIni,
+      target_id: idTargetAktif,
     })
     .select();
 
@@ -545,13 +614,14 @@ formHarian.addEventListener("submit", async function (event) {
 
   tampilkanCatatan();
   gambarGrafik();
+  perbaruiStatusTargetTercapai();
   formHarian.reset();
 });
 
 function tampilkanCatatan() {
   daftarCatatan.innerHTML = "";
 
-  catatanHarian.forEach(function (catatan) {
+  catatanPeriodeAktif().forEach(function (catatan) {
     const item = document.createElement("div");
     item.className = "log-item";
     item.innerHTML = `
@@ -571,9 +641,11 @@ function gambarGrafik() {
   grafikBerat.innerHTML = "";
   grafikTanggal.innerHTML = "";
 
-  if (catatanHarian.length === 0) return;
+  const data = catatanPeriodeAktif();
 
-  const semuaBerat = catatanHarian.map(function (catatan) {
+  if (data.length === 0) return;
+
+  const semuaBerat = data.map(function (catatan) {
     return Number(catatan.berat);
   });
 
@@ -585,14 +657,14 @@ function gambarGrafik() {
     return ((berat - beratMin) / rentang) * 80 + 20;
   }
 
-  catatanHarian.forEach(function (catatan, index) {
+  data.forEach(function (catatan, index) {
     const tinggiPersen = hitungTinggiPersen(Number(catatan.berat));
 
     const bar = document.createElement("div");
     bar.className = "bar";
 
     if (index > 0) {
-      const beratSebelumnya = Number(catatanHarian[index - 1].berat);
+      const beratSebelumnya = Number(data[index - 1].berat);
       bar.classList.add(Number(catatan.berat) <= beratSebelumnya ? "bar-turun" : "bar-naik");
     }
 
@@ -641,7 +713,7 @@ function tampilkanRingkasan() {
   const tujuhHariLalu = new Date();
   tujuhHariLalu.setDate(tujuhHariLalu.getDate() - 7);
 
-  const catatanMingguIni = catatanHarian.filter(function (c) {
+  const catatanMingguIni = catatanPeriodeAktif().filter(function (c) {
     return new Date(c.tanggal) >= tujuhHariLalu;
   });
 
