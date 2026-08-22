@@ -760,3 +760,34 @@ function tampilkanRingkasan() {
   document.getElementById("statRataAir").textContent = rataAir.toFixed(1);
   document.getElementById("statJumlahHari").textContent = catatanMingguIni.length;
 }
+
+/* ---------- Kasih Masukan ---------- */
+
+const formMasukan = document.getElementById("masukanForm");
+const pesanMasukan = document.getElementById("pesanMasukan");
+const statusMasukan = document.getElementById("statusMasukan");
+
+formMasukan.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const pesan = pesanMasukan.value.trim();
+
+  if (pesan === "") {
+    tampilkanPesan(statusMasukan, "Tulis masukannya dulu ya.", "error");
+    return;
+  }
+
+  tampilkanPesan(statusMasukan, "Ngirim...", "");
+
+  const { error } = await supabaseClient
+    .from("masukan")
+    .insert({ pesan: pesan, user_id: userSaatIni });
+
+  if (error) {
+    tampilkanPesan(statusMasukan, "Gagal ngirim: " + error.message, "error");
+    return;
+  }
+
+  tampilkanPesan(statusMasukan, "Makasih! Masukan kamu udah terkirim 🙏", "sukses");
+  formMasukan.reset();
+});
