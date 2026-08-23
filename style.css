@@ -3,8 +3,8 @@
   --surface: #FBF9F5;
   --ink: #211D19;
   --ink-muted: #6B655C;
-  --accent: #C1272D;
-  --accent-dark: #8F1B20;
+  --accent: #B2563A;
+  --accent-dark: #8C4128;
   --success: #1F7A3D;
   --danger: #B3261E;
   --screen-bg: #12201A;
@@ -40,8 +40,8 @@
   --surface: #262019;
   --ink: #EDE7DC;
   --ink-muted: #A69C8C;
-  --accent: #E2453B;
-  --accent-dark: #F16158;
+  --accent: #BD5936;
+  --accent-dark: #C6693F;
   --success: #4ECB78;
   --danger: #FF6B61;
   --border: #3A332B;
@@ -134,6 +134,15 @@ h1 {
   font-size: 10.5px;
   letter-spacing: 1px;
   color: var(--ink-muted);
+}
+
+/* ---------- Icon (Lucide, gantiin emoji) ---------- */
+
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
 }
 
 /* ---------- Focus (aksesibilitas) ---------- */
@@ -263,6 +272,9 @@ textarea:focus-visible {
   min-height: 38px;
   min-width: 38px;
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--surface);
   border: 1px solid var(--ink-muted);
   border-radius: 8px;
@@ -331,6 +343,9 @@ textarea:focus-visible {
 }
 
 .pengingat-box label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin: 0;
   color: var(--ink-muted);
   font-size: 13px;
@@ -348,6 +363,10 @@ textarea:focus-visible {
 .pengingat-box button {
   min-height: 40px;
   padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   background-color: var(--accent);
   color: white;
   border: none;
@@ -507,7 +526,7 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(193, 39, 45, 0.12);
+  box-shadow: 0 0 0 3px rgba(178, 86, 58, 0.14);
 }
 
 button[type="submit"] {
@@ -588,6 +607,10 @@ button[type="submit"]:active {
 .badge-tercapai {
   margin-top: 14px;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   text-align: center;
   padding: 12px 16px;
   background-color: var(--success);
@@ -609,6 +632,10 @@ button[type="submit"]:active {
   margin-top: 16px;
   width: 100%;
   min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   background-color: transparent;
   border: 1px solid var(--ink-muted);
   border-radius: 8px;
@@ -652,12 +679,16 @@ button[type="submit"]:active {
 }
 
 h2 {
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--ink-muted);
-  margin-top: 28px;
-  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  color: var(--ink);
+  margin-top: 32px;
+  margin-bottom: 14px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
   width: 100%;
 }
 
@@ -724,7 +755,7 @@ h2 {
 }
 
 .bar-naik {
-  background-color: var(--accent);
+  background-color: var(--danger);
 }
 
 .bar span {
@@ -801,7 +832,7 @@ h2 {
 .stat-kotak {
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 14px 4px;
   text-align: center;
 }
