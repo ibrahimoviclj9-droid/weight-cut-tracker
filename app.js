@@ -216,6 +216,23 @@ function urlBase64ToUint8Array(base64String) {
 // kirim 1 notifikasi konfirmasi — jadi aktivasi + tes jadi satu langkah.
 btnAktifkanPush.addEventListener("click", async function () {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    // Deteksi iPhone/iPad yang BELUM di-"Add to Home Screen" — di
+    // Safari iOS, PushManager cuma tersedia kalau web-nya udah
+    // "diinstall" ke Home Screen dulu (batasan dari Apple, bukan
+    // dari app ini). Kasih instruksi yang jelas, bukan pesan generik.
+    const iOSBelumInstall =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      window.navigator.standalone !== true;
+
+    if (iOSBelumInstall) {
+      tampilkanPesan(
+        statusPengingat,
+        "Di iPhone/iPad, notifikasi cuma bisa aktif kalau web ini di-\"Add to Home Screen\" dulu. Tap ikon Share di Safari, lalu pilih \"Add to Home Screen\".",
+        "error"
+      );
+      return;
+    }
+
     tampilkanPesan(statusPengingat, "Browser kamu nggak mendukung push notification.", "error");
     return;
   }
