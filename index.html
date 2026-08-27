@@ -43,7 +43,7 @@
   </header>
 
   <div id="authBox" class="auth-box">
-    <p>Masuk atau daftar dulu buat mulai tracking.</p>
+    <p>Masuk atau daftar untuk mulai menggunakan aplikasi.</p>
     <input type="email" id="authEmail" placeholder="Email">
     <input type="password" id="authPassword" placeholder="Password">
     <div class="auth-tombol">
@@ -77,14 +77,14 @@
   </nav>
 
   <section id="langkah-profil" class="langkah aktif">
-    <p>Yuk buat profil kamu dulu sebelum mulai tracking weight cut.</p>
+    <p>Lengkapi profil Anda terlebih dahulu sebelum memulai pelacakan weight cut.</p>
 
     <form id="profilForm">
       <label for="nama">Nama:</label>
       <input type="text" id="nama" name="nama">
       <br>
 
-      <label for="peran">Kamu ini:</label>
+      <label for="peran">Peran:</label>
       <select id="peran" name="peran">
         <option value="atlet">Atlet</option>
         <option value="coach">Coach</option>
@@ -104,7 +104,7 @@
   </section>
 
   <section id="langkah-target" class="langkah">
-    <p>Isi target berat badan dan tanggal weigh-in kamu.</p>
+    <p>Masukkan target berat badan dan tanggal weigh-in Anda.</p>
 
     <form id="targetForm">
       <label for="target-berat">Target berat badan (<span class="unit-teks">kg</span>):</label>
@@ -149,11 +149,11 @@
       <br>
 
       <label for="latihan">Latihan hari ini:</label>
-      <input type="text" id="latihan" name="latihan" placeholder="misal: lari 30 menit">
+      <input type="text" id="latihan" name="latihan" placeholder="Contoh: lari 30 menit">
       <br>
 
       <label for="nutrisi">Catatan nutrisi/makanan:</label>
-      <input type="text" id="nutrisi" name="nutrisi" placeholder="misal: defisit kalori, tinggi protein">
+      <input type="text" id="nutrisi" name="nutrisi" placeholder="Contoh: defisit kalori, tinggi protein">
       <br>
 
       <button type="submit">Simpan Catatan</button>
@@ -170,10 +170,10 @@
   </section>
 
   <section id="langkah-ringkasan" class="langkah">
-    <p>Ringkasan progres kamu 7 hari terakhir.</p>
+    <p>Ringkasan progres Anda dalam 7 hari terakhir.</p>
 
     <div id="ringkasanKosong">
-      <p class="pesan">Belum ada catatan dalam 7 hari terakhir. Isi dulu di step "Harian" ya.</p>
+      <p class="pesan">Belum ada catatan dalam 7 hari terakhir. Silakan lengkapi terlebih dahulu pada bagian "Harian".</p>
     </div>
 
     <div id="ringkasanIsi" class="ringkasan-tersembunyi">
@@ -185,11 +185,11 @@
       <div class="stat-grid">
         <div class="stat-kotak">
           <span id="statRataBerat" class="stat-angka">–</span>
-          <span class="stat-label">Rata² Berat</span>
+          <span class="stat-label">Rata-rata Berat</span>
         </div>
         <div class="stat-kotak">
           <span id="statRataAir" class="stat-angka">–</span>
-          <span class="stat-label">Rata² Air (L)</span>
+          <span class="stat-label">Rata-rata Air (L)</span>
         </div>
         <div class="stat-kotak">
           <span id="statJumlahHari" class="stat-angka">–</span>
@@ -198,9 +198,9 @@
       </div>
     </div>
 
-    <h2>Kasih Masukan</h2>
+    <h2>Kirim Masukan</h2>
     <form id="masukanForm">
-      <label for="pesanMasukan">Ada saran, laporan bug, atau masukan buat developer?</label>
+      <label for="pesanMasukan">Ada saran, laporan bug, atau masukan untuk pengembang?</label>
       <textarea id="pesanMasukan" name="pesanMasukan" rows="3" placeholder="Tulis di sini..."></textarea>
       <button type="submit">Kirim Masukan</button>
     </form>

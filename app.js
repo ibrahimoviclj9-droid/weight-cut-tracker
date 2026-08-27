@@ -68,7 +68,7 @@ const btnKeluar = document.getElementById("btnKeluar");
 
 btnDaftar.addEventListener("click", async function () {
   if (authEmail.value === "" || authPassword.value === "") {
-    tampilkanPesan(pesanAuth, "Isi email dan password dulu ya.", "error");
+    tampilkanPesan(pesanAuth, "Email dan password wajib diisi.", "error");
     return;
   }
 
@@ -84,12 +84,12 @@ btnDaftar.addEventListener("click", async function () {
     return;
   }
 
-  tampilkanPesan(pesanAuth, "Berhasil daftar! Cek email kamu buat konfirmasi, baru bisa masuk.", "sukses");
+  tampilkanPesan(pesanAuth, "Pendaftaran berhasil! Silakan periksa email Anda untuk konfirmasi sebelum masuk.", "sukses");
 });
 
 btnMasuk.addEventListener("click", async function () {
   if (authEmail.value === "" || authPassword.value === "") {
-    tampilkanPesan(pesanAuth, "Isi email dan password dulu ya.", "error");
+    tampilkanPesan(pesanAuth, "Email dan password wajib diisi.", "error");
     return;
   }
 
@@ -233,12 +233,12 @@ btnAktifkanPush.addEventListener("click", async function () {
       return;
     }
 
-    tampilkanPesan(statusPengingat, "Browser kamu nggak mendukung push notification.", "error");
+    tampilkanPesan(statusPengingat, "Browser Anda tidak mendukung push notification.", "error");
     return;
   }
 
   if (inputJamPengingat.value === "") {
-    tampilkanPesan(statusPengingat, "Pilih jam pengingat dulu ya.", "error");
+    tampilkanPesan(statusPengingat, "Jam pengingat wajib dipilih terlebih dahulu.", "error");
     return;
   }
 
@@ -270,22 +270,22 @@ btnAktifkanPush.addEventListener("click", async function () {
     });
 
     if (error) {
-      tampilkanPesan(statusPengingat, "Gagal simpan subscription: " + error.message, "error");
+      tampilkanPesan(statusPengingat, "Gagal menyimpan subscription: " + error.message, "error");
       return;
     }
 
-    tampilkanPesan(statusPengingat, "Aktif! Ngirim notifikasi konfirmasi...", "");
+    tampilkanPesan(statusPengingat, "Aktif! Mengirim notifikasi konfirmasi...", "");
 
     const { error: errorKirim } = await supabaseClient.functions.invoke("kirim-push");
 
     if (errorKirim) {
-      tampilkanPesan(statusPengingat, "Notifikasi aktif, tapi tes kirim gagal: " + errorKirim.message, "error");
+      tampilkanPesan(statusPengingat, "Notifikasi aktif, tetapi pengujian pengiriman gagal: " + errorKirim.message, "error");
       return;
     }
 
-    tampilkanPesan(statusPengingat, `Notifikasi aktif! Kamu bakal diingetin tiap jam ${inputJamPengingat.value}. Cek notifikasi konfirmasinya sekarang.`, "sukses");
+    tampilkanPesan(statusPengingat, `Notifikasi aktif! Anda akan diingatkan setiap jam ${inputJamPengingat.value}. Silakan periksa notifikasi konfirmasi yang baru saja dikirim.`, "sukses");
   } catch (err) {
-    tampilkanPesan(statusPengingat, "Gagal aktifin notifikasi: " + err.message, "error");
+    tampilkanPesan(statusPengingat, "Gagal mengaktifkan notifikasi: " + err.message, "error");
   }
 });
 
@@ -335,7 +335,7 @@ formProfil.addEventListener("submit", async function (event) {
   const beratRaw = document.getElementById("berat-sekarang").value;
 
   if (nama === "") {
-    tampilkanPesan(pesanProfil, "Nama wajib diisi dulu ya.", "error");
+    tampilkanPesan(pesanProfil, "Nama wajib diisi.", "error");
     return;
   }
 
@@ -351,14 +351,14 @@ formProfil.addEventListener("submit", async function (event) {
     return;
   }
 
-  tampilkanPesan(pesanProfil, "Nyimpen...", "");
+  tampilkanPesan(pesanProfil, "Menyimpan...", "");
 
   const { error } = await supabaseClient
     .from("profil")
     .insert({ nama: nama, peran: peran, berat_awal: beratKg, user_id: userSaatIni });
 
   if (error) {
-    tampilkanPesan(pesanProfil, "Gagal nyimpen ke database: " + error.message, "error");
+    tampilkanPesan(pesanProfil, "Gagal menyimpan ke database: " + error.message, "error");
     return;
   }
 
@@ -418,7 +418,7 @@ formTarget.addEventListener("submit", async function (event) {
   }
 
   if (targetBeratKg < 45) {
-    tampilkanPesan(pesanTarget, "⚠️ Target ini berisiko tinggi buat kesehatan. Sebaiknya diskusikan dulu sama dokter/nutrisionis olahraga sebelum lanjut.", "error");
+    tampilkanPesan(pesanTarget, "⚠️ Target ini berisiko tinggi bagi kesehatan. Sebaiknya konsultasikan terlebih dahulu dengan dokter/nutrisionis olahraga sebelum melanjutkan.", "error");
     return;
   }
 
@@ -433,11 +433,11 @@ formTarget.addEventListener("submit", async function (event) {
   const selisihHari = Math.ceil(selisihMs / (1000 * 60 * 60 * 24));
 
   if (selisihHari < 0) {
-    tampilkanPesan(pesanTarget, "Tanggal weigh-in itu udah lewat, coba cek lagi tanggalnya.", "error");
+    tampilkanPesan(pesanTarget, "Tanggal weigh-in sudah lewat. Silakan periksa kembali tanggal yang dimasukkan.", "error");
     return;
   }
 
-  tampilkanPesan(pesanTarget, "Nyimpen...", "");
+  tampilkanPesan(pesanTarget, "Menyimpan...", "");
 
   const { data, error } = await supabaseClient
     .from("target")
@@ -445,7 +445,7 @@ formTarget.addEventListener("submit", async function (event) {
     .select();
 
   if (error) {
-    tampilkanPesan(pesanTarget, "Gagal nyimpen ke database: " + error.message, "error");
+    tampilkanPesan(pesanTarget, "Gagal menyimpan ke database: " + error.message, "error");
     return;
   }
 
@@ -573,7 +573,7 @@ async function muatDataDariSupabase() {
     .order("tanggal", { ascending: true });
 
   if (error) {
-    tampilkanPesan(pesanHarian, "Gagal ambil data dari database: " + error.message, "error");
+    tampilkanPesan(pesanHarian, "Gagal mengambil data dari database: " + error.message, "error");
     return;
   }
 
@@ -611,7 +611,7 @@ formHarian.addEventListener("submit", async function (event) {
     return;
   }
 
-  tampilkanPesan(pesanHarian, "Nyimpen...", "");
+  tampilkanPesan(pesanHarian, "Menyimpan...", "");
 
   const { data, error } = await supabaseClient
     .from("catatan_harian")
@@ -627,7 +627,7 @@ formHarian.addEventListener("submit", async function (event) {
     .select();
 
   if (error) {
-    tampilkanPesan(pesanHarian, "Gagal nyimpen ke database: " + error.message, "error");
+    tampilkanPesan(pesanHarian, "Gagal menyimpan ke database: " + error.message, "error");
     return;
   }
 
@@ -799,21 +799,21 @@ formMasukan.addEventListener("submit", async function (event) {
   const pesan = pesanMasukan.value.trim();
 
   if (pesan === "") {
-    tampilkanPesan(statusMasukan, "Tulis masukannya dulu ya.", "error");
+    tampilkanPesan(statusMasukan, "Masukan wajib diisi terlebih dahulu.", "error");
     return;
   }
 
-  tampilkanPesan(statusMasukan, "Ngirim...", "");
+  tampilkanPesan(statusMasukan, "Mengirim...", "");
 
   const { error } = await supabaseClient
     .from("masukan")
     .insert({ pesan: pesan, user_id: userSaatIni });
 
   if (error) {
-    tampilkanPesan(statusMasukan, "Gagal ngirim: " + error.message, "error");
+    tampilkanPesan(statusMasukan, "Gagal mengirim: " + error.message, "error");
     return;
   }
 
-  tampilkanPesan(statusMasukan, "Makasih! Masukan kamu udah terkirim 🙏", "sukses");
+  tampilkanPesan(statusMasukan, "Terima kasih! Masukan Anda telah terkirim.", "sukses");
   formMasukan.reset();
 });
