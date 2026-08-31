@@ -3,8 +3,9 @@
   --surface: #FBF9F5;
   --ink: #211D19;
   --ink-muted: #6B655C;
-  --accent: #B2563A;
-  --accent-dark: #8C4128;
+  --accent: #211D19;
+  --accent-dark: #3A332B;
+  --accent-text: #FBF9F5;
   --success: #1F7A3D;
   --danger: #B3261E;
   --screen-bg: #12201A;
@@ -40,8 +41,9 @@
   --surface: #262019;
   --ink: #EDE7DC;
   --ink-muted: #A69C8C;
-  --accent: #BD5936;
-  --accent-dark: #C6693F;
+  --accent: #EDE7DC;
+  --accent-dark: #D6CFC0;
+  --accent-text: #1C1815;
   --success: #4ECB78;
   --danger: #FF6B61;
   --border: #3A332B;
@@ -130,9 +132,9 @@ h1 {
 
 .eyebrow {
   margin: 6px 0 0;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 1px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
   color: var(--ink-muted);
 }
 
@@ -205,7 +207,7 @@ textarea:focus-visible {
 
 #btnMasuk {
   background-color: var(--accent);
-  color: white;
+  color: var(--accent-text);
 }
 
 #btnMasuk:hover {
@@ -368,7 +370,7 @@ textarea:focus-visible {
   justify-content: center;
   gap: 6px;
   background-color: var(--accent);
-  color: white;
+  color: var(--accent-text);
   border: none;
   border-radius: 8px;
   font-family: var(--font-display);
@@ -526,7 +528,17 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(178, 86, 58, 0.14);
+  box-shadow: 0 0 0 3px rgba(33, 29, 25, 0.12);
+}
+
+/* Di tema gelap, --accent ikut jadi TERANG (biar tombolnya tetep
+   keliatan beda dari background gelap) — makanya glow fokus ini juga
+   perlu dibalik jadi terang, kalau enggak bakal nyaris nggak keliatan
+   dobel-gelap di atas input yang udah gelap. */
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+  box-shadow: 0 0 0 3px rgba(237, 231, 220, 0.16);
 }
 
 button[type="submit"] {
@@ -534,7 +546,7 @@ button[type="submit"] {
   width: 100%;
   min-height: 48px;
   background-color: var(--accent);
-  color: white;
+  color: var(--accent-text);
   border: none;
   border-radius: 8px;
   font-family: var(--font-display);
@@ -866,7 +878,7 @@ h2 {
   }
 
   .eyebrow {
-    font-size: 11px;
+    font-size: 15px;
   }
 
   form,
