@@ -21,7 +21,7 @@
   --shadow-lg: 0 16px 36px rgba(33, 29, 25, 0.13), 0 4px 10px rgba(33, 29, 25, 0.07);
 
   --contain: 440px;
-  --radius: 12px;
+  --radius: 16px;
 
   --input-bg: #FFFFFF;
   --surface-hover: #FFFFFF;
@@ -82,8 +82,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 16px 64px;
-  line-height: 1.5;
+  padding: 36px 20px 100px;
+  line-height: 1.6;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -104,7 +104,6 @@ p {
 .header-utama,
 .auth-box,
 .pengingat-box,
-.nav-langkah,
 .langkah {
   width: 100%;
   max-width: var(--contain);
@@ -113,10 +112,17 @@ p {
 /* ---------- Header ---------- */
 
 .header-utama {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+  padding: 10px 0 14px;
+  background-color: var(--bg);
   text-align: center;
 }
 
@@ -153,7 +159,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--success);
   outline-offset: 2px;
 }
 
@@ -163,11 +169,11 @@ textarea:focus-visible {
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px;
+  padding: 26px 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -192,7 +198,7 @@ textarea:focus-visible {
   flex: 1;
   min-height: 46px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -202,7 +208,7 @@ textarea:focus-visible {
 }
 
 .auth-tombol button:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 #btnMasuk {
@@ -245,7 +251,7 @@ textarea:focus-visible {
   padding: 0 16px;
   background-color: var(--surface);
   border: 1px solid var(--ink-muted);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--ink-muted);
   font-family: var(--font-body);
   font-size: 13px;
@@ -262,7 +268,7 @@ textarea:focus-visible {
 }
 
 .btn-keluar:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 /* ---------- Tombol mode gelap/terang ---------- */
@@ -279,7 +285,7 @@ textarea:focus-visible {
   justify-content: center;
   background-color: var(--surface);
   border: 1px solid var(--ink-muted);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -293,7 +299,7 @@ textarea:focus-visible {
 }
 
 .btn-mode-gelap:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 /* ---------- Satuan toggle ---------- */
@@ -334,9 +340,9 @@ textarea:focus-visible {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 12px;
-  margin-bottom: 20px;
-  padding: 14px 16px;
+  gap: 12px 14px;
+  margin-bottom: 24px;
+  padding: 18px 20px;
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -369,25 +375,26 @@ textarea:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background-color: var(--accent);
-  color: var(--accent-text);
-  border: none;
-  border-radius: 8px;
+  background-color: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink-muted);
+  border-radius: 10px;
   font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: transform 0.1s ease, background-color 0.15s ease;
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
   width: 100%;
   order: 1;
 }
 
 .pengingat-box button:hover {
-  background-color: var(--accent-dark);
+  background-color: var(--surface-hover);
+  border-color: var(--ink);
 }
 
 .pengingat-box button:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 .pengingat-box .pesan {
@@ -396,38 +403,69 @@ textarea:focus-visible {
   font-size: 12.5px;
 }
 
-/* ---------- Navigasi antar langkah ---------- */
+/* ---------- Navigasi antar langkah (bottom tab bar) ---------- */
 
 .nav-langkah {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 20px;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -6px 20px rgba(33, 29, 25, 0.08);
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
 }
 
 .nav-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 12.5px;
-  min-height: 42px;
-  padding: 0 4px;
-  border: 1px solid var(--border);
-  background-color: var(--surface);
+  font-size: 10.5px;
+  min-height: 52px;
+  padding: 6px 2px;
+  border: none;
+  background: none;
   color: var(--ink-muted);
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease;
+}
+
+.nav-btn::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--success);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.nav-btn.aktif::before {
+  opacity: 1;
+}
+
+.nav-btn .icon-tab {
+  width: 22px;
+  height: 22px;
 }
 
 .nav-btn:hover {
-  border-color: var(--ink-muted);
+  color: var(--ink);
 }
 
 .nav-btn.aktif {
-  background-color: var(--ink);
-  color: var(--surface);
-  border-color: var(--ink);
-  box-shadow: var(--shadow-sm);
+  color: var(--success);
 }
 
 /* ---------- Langkah (step) ---------- */
@@ -468,7 +506,7 @@ form {
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px;
+  padding: 26px 24px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -478,8 +516,8 @@ label {
   font-weight: 600;
   font-size: 13px;
   color: var(--ink-muted);
-  margin-top: 18px;
-  margin-bottom: 6px;
+  margin-top: 22px;
+  margin-bottom: 8px;
 }
 
 label:first-child {
@@ -490,10 +528,10 @@ input,
 select,
 textarea {
   width: 100%;
-  min-height: 46px;
-  padding: 0 12px;
+  min-height: 50px;
+  padding: 0 14px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: var(--input-bg);
   font-family: var(--font-body);
   font-size: 16px;
@@ -539,28 +577,26 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(33, 29, 25, 0.12);
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(31, 122, 61, 0.16);
 }
 
-/* Di tema gelap, --accent ikut jadi TERANG (biar tombolnya tetep
-   keliatan beda dari background gelap) - makanya glow fokus ini juga
-   perlu dibalik jadi terang, kalau enggak bakal nyaris nggak keliatan
-   dobel-gelap di atas input yang udah gelap. */
+/* Hijau fokus di tema gelap disesuain ke --success versi gelap juga
+   (lebih terang), biar tetep kebaca jelas di atas input yang gelap. */
 [data-theme="dark"] input:focus,
 [data-theme="dark"] select:focus,
 [data-theme="dark"] textarea:focus {
-  box-shadow: 0 0 0 3px rgba(237, 231, 220, 0.16);
+  box-shadow: 0 0 0 3px rgba(78, 203, 120, 0.2);
 }
 
 button[type="submit"] {
-  margin-top: 22px;
+  margin-top: 26px;
   width: 100%;
-  min-height: 48px;
+  min-height: 52px;
   background-color: var(--accent);
   color: var(--accent-text);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -574,7 +610,7 @@ button[type="submit"]:hover {
 }
 
 button[type="submit"]:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 .pesan {
@@ -598,7 +634,7 @@ button[type="submit"]:active {
   min-height: 40px;
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--success);
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 13.5px;
@@ -607,7 +643,7 @@ button[type="submit"]:active {
 }
 
 .btn-lanjut:hover {
-  color: var(--accent-dark);
+  color: var(--ink);
 }
 
 /* ---------- Layar digital (elemen penanda desain) ---------- */
@@ -670,7 +706,7 @@ button[type="submit"]:active {
   gap: 6px;
   background-color: transparent;
   border: 1px solid var(--ink-muted);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--ink-muted);
   font-family: var(--font-body);
   font-weight: 600;
@@ -686,7 +722,7 @@ button[type="submit"]:active {
 }
 
 .btn-periode-baru:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 .layar-angka {
@@ -738,9 +774,9 @@ h2 {
   padding: 12px 14px;
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 8px;
-  margin-bottom: 6px;
+  border-left: 3px solid var(--success);
+  border-radius: 10px;
+  margin-bottom: 8px;
 }
 
 .log-tanggal {
@@ -864,7 +900,7 @@ h2 {
 .stat-kotak {
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 14px 4px;
   text-align: center;
 }
@@ -889,7 +925,7 @@ h2 {
 
 @media (min-width: 560px) {
   body {
-    padding: 56px 20px 80px;
+    padding: 56px 20px 110px;
   }
 
   h1 {
