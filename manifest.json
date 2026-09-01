@@ -1,7 +1,7 @@
 {
   "name": "Weight Cut Tracker",
   "short_name": "WCT",
-  "description": "Pelacak Weight Cut — Atlet & Coach",
+  "description": "Pelacak Weight Cut - Atlet & Coach",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

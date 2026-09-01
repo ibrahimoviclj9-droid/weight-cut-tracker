@@ -30,9 +30,9 @@
 
 /* ---------- Mode Gelap ---------- */
 /* Sengaja TETAP hangat (bukan hitam pekat + hijau nge-jreng khas "dark
-   mode AI generik") — cuma versi gelap dari palet krem/stone yang udah
+   mode AI generik") - cuma versi gelap dari palet krem/stone yang udah
    ada, biar identitasnya tetap sama. Warna "layar LCD" (--screen-*) di
-   bawah sengaja NGGAK diubah — itu emang udah gelap dari awal, konsepnya
+   bawah sengaja NGGAK diubah - itu emang udah gelap dari awal, konsepnya
    "layar timbangan digital" yang nggak berubah biarpun lampu ruangan
    dimatiin. */
 
@@ -440,6 +440,18 @@ textarea:focus-visible {
 
 .langkah.aktif {
   display: flex;
+  animation: masukLangkah 0.32s ease;
+}
+
+@keyframes masukLangkah {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .langkah > p:first-child {
@@ -490,7 +502,7 @@ textarea {
 }
 
 /* appearance:none SENGAJA nggak dipasang di input[type=date]/[type=time]
-   — soalnya itu bisa bikin ikon kalender/jam bawaan browser ilang di
+   - soalnya itu bisa bikin ikon kalender/jam bawaan browser ilang di
    sebagian device. Cuma dipasang di jenis input yang "aman", biar
    tampilannya konsisten di semua browser tanpa ngerusak fitur lain. */
 input:not([type="date"]):not([type="time"]),
@@ -532,7 +544,7 @@ textarea:focus {
 }
 
 /* Di tema gelap, --accent ikut jadi TERANG (biar tombolnya tetep
-   keliatan beda dari background gelap) — makanya glow fokus ini juga
+   keliatan beda dari background gelap) - makanya glow fokus ini juga
    perlu dibalik jadi terang, kalau enggak bakal nyaris nggak keliatan
    dobel-gelap di atas input yang udah gelap. */
 [data-theme="dark"] input:focus,
@@ -616,6 +628,10 @@ button[type="submit"]:active {
   display: none;
 }
 
+.layar:not(.layar-tersembunyi) {
+  animation: masukLangkah 0.32s ease;
+}
+
 .badge-tercapai {
   margin-top: 14px;
   width: 100%;
@@ -638,6 +654,10 @@ button[type="submit"]:active {
 
 .badge-tersembunyi {
   display: none;
+}
+
+.badge-tercapai:not(.badge-tersembunyi) {
+  animation: masukLangkah 0.32s ease;
 }
 
 .btn-periode-baru {

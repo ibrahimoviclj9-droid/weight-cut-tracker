@@ -148,7 +148,7 @@ function formatBerat(kg) {
   return `${nilai.toFixed(1)} ${satuanAktif}`;
 }
 
-// Baca nilai mentah dari sebuah input berat, dan selalu kembalikan dalam kg —
+// Baca nilai mentah dari sebuah input berat, dan selalu kembalikan dalam kg -
 // biar semua perhitungan di bawah nggak perlu peduli satuan apa yang lagi aktif.
 function bacaBeratKg(nilaiString) {
   const angka = Number(nilaiString);
@@ -184,7 +184,7 @@ const btnAktifkanPush = document.getElementById("btnAktifkanPush");
 const inputJamPengingat = document.getElementById("jamPengingat");
 
 // Server jalan pakai jam UTC, sedangkan kamu milih jam pakai waktu lokal
-// (WIB, dst) — ini konversinya, biar jam yang tersimpan udah "pas" buat
+// (WIB, dst) - ini konversinya, biar jam yang tersimpan udah "pas" buat
 // dibandingin server nanti.
 function konversiJamKeUTC(jamLokal) {
   const bagian = jamLokal.split(":").map(Number);
@@ -199,7 +199,7 @@ const statusPengingat = document.getElementById("statusPengingat");
 const VAPID_PUBLIC_KEY = "BE8r2yQcvwzjbL9vZ_5SjH7N4loU4AXBhv0zns1HcaVMnhhFqmhbi_qP5bFreCSes1Vs5BNAXfbYlZcRBoVGluc";
 
 // Web Push butuh applicationServerKey dalam bentuk Uint8Array,
-// bukan string — ini fungsi konversinya.
+// bukan string - ini fungsi konversinya.
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -213,10 +213,10 @@ function urlBase64ToUint8Array(base64String) {
 
 // Satu tombol ini ngerjain semuanya: daftar Service Worker, minta izin,
 // subscribe ke push, simpan ke Supabase, LALU langsung minta server
-// kirim 1 notifikasi konfirmasi — jadi aktivasi + tes jadi satu langkah.
+// kirim 1 notifikasi konfirmasi - jadi aktivasi + tes jadi satu langkah.
 btnAktifkanPush.addEventListener("click", async function () {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-    // Deteksi iPhone/iPad yang BELUM di-"Add to Home Screen" — di
+    // Deteksi iPhone/iPad yang BELUM di-"Add to Home Screen" - di
     // Safari iOS, PushManager cuma tersedia kalau web-nya udah
     // "diinstall" ke Home Screen dulu (batasan dari Apple, bukan
     // dari app ini). Kasih instruksi yang jelas, bukan pesan generik.
@@ -373,7 +373,7 @@ async function muatProfilTerbaru() {
     .order("created_at", { ascending: false })
     .limit(1);
 
-  // Selalu kosongin dulu — biar nggak kebawa sisa data akun sebelumnya
+  // Selalu kosongin dulu - biar nggak kebawa sisa data akun sebelumnya
   // kalau akun yang lagi login ini ternyata belum punya profil.
   document.getElementById("nama").value = "";
   document.getElementById("peran").value = "atlet";
@@ -460,7 +460,7 @@ formTarget.addEventListener("submit", async function (event) {
   gambarGrafik();
 });
 
-// Tombol ini nggak langsung nyimpen apa-apa ke database — dia cuma
+// Tombol ini nggak langsung nyimpen apa-apa ke database - dia cuma
 // ngosongin form Target biar siap diisi target BARU. Periode baru itu
 // baru beneran "mulai" pas kamu submit target barunya. Data periode
 // yang sekarang tetep utuh aman di database, cuma nanti nggak ikut
@@ -511,7 +511,7 @@ async function muatTargetTerbaru() {
     .order("created_at", { ascending: false })
     .limit(1);
 
-  // Sama kayak profil — kosongin dulu, biar nggak kebawa sisa data
+  // Sama kayak profil - kosongin dulu, biar nggak kebawa sisa data
   // akun sebelumnya.
   document.getElementById("target-berat").value = "";
   document.getElementById("tanggal-weighin").value = "";
@@ -732,7 +732,7 @@ function tampilkanRingkasan() {
   const ringkasanIsi = document.getElementById("ringkasanIsi");
 
   // Cuma ambil catatan dari 7 hari terakhir, biar ini beneran
-  // "ringkasan mingguan" — bukan rata-rata dari semua data sepanjang waktu.
+  // "ringkasan mingguan" - bukan rata-rata dari semua data sepanjang waktu.
   const tujuhHariLalu = new Date();
   tujuhHariLalu.setDate(tujuhHariLalu.getDate() - 7);
 
