@@ -123,16 +123,16 @@ p {
   margin-bottom: 28px;
   padding: 10px 0 14px;
   background-color: var(--bg);
-  text-align: center;
-}
+  text-align: center;}
 
 h1 {
   font-family: var(--font-display);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-size: 26px;
+  font-size: 24px;
   margin: 0;
+  padding: 0 48px;
   color: var(--ink);
 }
 
@@ -190,19 +190,19 @@ textarea:focus-visible {
 
 .auth-tombol {
   display: flex;
-  gap: 8px;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 .auth-tombol button {
-  flex: 1;
-  min-height: 46px;
+  min-height: 52px;
   border: none;
   border-radius: 10px;
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   transition: transform 0.1s ease, background-color 0.15s ease;
 }
@@ -223,11 +223,11 @@ textarea:focus-visible {
 #btnDaftar {
   background-color: transparent;
   color: var(--ink);
-  border: 1px solid var(--border) !important;
+  border: 1px solid var(--ink-muted) !important;
 }
 
 #btnDaftar:hover {
-  background-color: var(--bg);
+  background-color: var(--surface-hover);
 }
 
 /* ---------- App content ---------- */
@@ -244,27 +244,26 @@ textarea:focus-visible {
 }
 
 .btn-keluar {
-  position: fixed;
-  top: 14px;
-  right: 14px;
-  min-height: 38px;
-  padding: 0 16px;
-  background-color: var(--surface);
-  border: 1px solid var(--ink-muted);
+  margin-top: 28px;
+  width: 100%;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  color: var(--ink-muted);
+  color: var(--danger);
   font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 13.5px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.1s ease, background-color 0.15s ease;
-  z-index: 10;
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-keluar:hover {
   background-color: var(--surface-hover);
-  color: var(--ink);
+  border-color: var(--danger);
 }
 
 .btn-keluar:active {
@@ -274,9 +273,9 @@ textarea:focus-visible {
 /* ---------- Tombol mode gelap/terang ---------- */
 
 .btn-mode-gelap {
-  position: fixed;
-  top: 14px;
-  left: 14px;
+  position: absolute;
+  top: 10px;
+  left: 4px;
   min-height: 38px;
   min-width: 38px;
   padding: 0;
@@ -291,7 +290,6 @@ textarea:focus-visible {
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: transform 0.1s ease, background-color 0.15s ease;
-  z-index: 10;
 }
 
 .btn-mode-gelap:hover {
