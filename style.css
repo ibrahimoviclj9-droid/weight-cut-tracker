@@ -112,18 +112,15 @@ p {
 /* ---------- Header ---------- */
 
 .header-utama {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  z-index: 15;
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 28px;
   padding: 10px 0 14px;
-  background-color: var(--bg);
-  text-align: center;}
+  text-align: center;
+}
 
 h1 {
   font-family: var(--font-display);
@@ -947,4 +944,110 @@ h2 {
   .stat-angka {
     font-size: 21px;
   }
+}
+
+/* ---------- Modal konfirmasi (gantiin confirm() bawaan browser) ---------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: rgba(33, 29, 25, 0.45);
+  animation: modalMasuk 0.2s ease;
+}
+
+.modal-tersembunyi {
+  display: none;
+}
+
+@keyframes modalMasuk {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-kotak {
+  width: 100%;
+  max-width: 360px;
+  background-color: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: modalNaik 0.25s ease;
+}
+
+@keyframes modalNaik {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-kotak h3 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.modal-kotak p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.modal-tombol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.modal-tombol button {
+  min-height: 48px;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.modal-tombol button:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+#modalLanjut {
+  background-color: var(--accent);
+  color: var(--accent-text);
+  border: none;
+}
+
+#modalLanjut:hover {
+  background-color: var(--accent-dark);
+}
+
+#modalBatal {
+  background-color: transparent;
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+}
+
+#modalBatal:hover {
+  background-color: var(--surface-hover);
 }

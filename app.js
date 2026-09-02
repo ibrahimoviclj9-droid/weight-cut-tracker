@@ -20,6 +20,40 @@ function tampilkanPesan(elemen, teks, jenis) {
   if (jenis === "sukses") elemen.classList.add("pesan-sukses");
 }
 
+/* ---------- Modal Konfirmasi (custom, gantiin confirm() bawaan) ---------- */
+
+const modalKonfirmasi = document.getElementById("modalKonfirmasi");
+const modalJudul = document.getElementById("modalJudul");
+const modalPesan = document.getElementById("modalPesan");
+const modalBatal = document.getElementById("modalBatal");
+const modalLanjut = document.getElementById("modalLanjut");
+
+// Dipake kayak: const jawaban = await tampilkanKonfirmasi("Judul", "Pesan");
+// jawaban isinya true kalau user klik Lanjut, false kalau Batal.
+function tampilkanKonfirmasi(judul, pesan) {
+  modalJudul.textContent = judul;
+  modalPesan.textContent = pesan;
+  modalKonfirmasi.classList.remove("modal-tersembunyi");
+
+  return new Promise(function (resolve) {
+    function bersihkan(hasil) {
+      modalKonfirmasi.classList.add("modal-tersembunyi");
+      modalBatal.removeEventListener("click", klikBatal);
+      modalLanjut.removeEventListener("click", klikLanjut);
+      resolve(hasil);
+    }
+    function klikBatal() {
+      bersihkan(false);
+    }
+    function klikLanjut() {
+      bersihkan(true);
+    }
+
+    modalBatal.addEventListener("click", klikBatal);
+    modalLanjut.addEventListener("click", klikLanjut);
+  });
+}
+
 /* ---------- Mode Gelap/Terang ---------- */
 
 const btnModeGelap = document.getElementById("btnModeGelap");
@@ -465,9 +499,10 @@ formTarget.addEventListener("submit", async function (event) {
 // baru beneran "mulai" pas kamu submit target barunya. Data periode
 // yang sekarang tetep utuh aman di database, cuma nanti nggak ikut
 // ditampilin lagi di grafik/ringkasan/badge begitu ada periode baru.
-btnPeriodeBaru.addEventListener("click", function () {
-  const konfirmasi = confirm(
-    "Mulai periode/cut baru?\n\nData & grafik periode SEKARANG tetap aman tersimpan. Form Target bakal dikosongin, dan grafik bakal mulai dari nol lagi buat periode barunya.\n\nLanjut?"
+btnPeriodeBaru.addEventListener("click", async function () {
+  const konfirmasi = await tampilkanKonfirmasi(
+    "Mulai Periode Baru?",
+    "Data & grafik periode SEKARANG tetap aman tersimpan. Form Target bakal dikosongin, dan grafik bakal mulai dari nol lagi buat periode barunya."
   );
 
   if (!konfirmasi) return;
@@ -817,3 +852,58 @@ formMasukan.addEventListener("submit", async function (event) {
   tampilkanPesan(statusMasukan, "Terima kasih! Masukan Anda telah terkirim.", "sukses");
   formMasukan.reset();
 });
+
+/* ---------- Getar (Haptic Feedback) ---------- */
+
+// Getar tipis tiap kali nge-tap TOMBOL apapun di app ini (nav, submit,
+// dll) - kayak feedback yang biasa dirasain di app native. Cuma jalan
+// di HP yang browser-nya dukung Vibration API (kebanyakan Android;
+// iPhone/Safari belum dukung, jadi di situ ya diem aja, nggak error).
+document.addEventListener("click", function (event) {
+  if (event.target.closest("button") && navigator.vibrate) {
+    navigator.vibrate(10);
+  }
+});
+
+/* ---------- Swipe Kiri/Kanan Buat Pindah Tab ---------- */
+
+const urutanLangkah = ["langkah-profil", "langkah-target", "langkah-harian", "langkah-ringkasan"];
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener(
+  "touchstart",
+  function (event) {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+  },
+  { passive: true }
+);
+
+document.addEventListener(
+  "touchend",
+  function (event) {
+    const deltaX = event.changedTouches[0].clientX - touchStartX;
+    const deltaY = event.changedTouches[0].clientY - touchStartY;
+
+    // Cuma dianggap "swipe pindah tab" kalau geraknya jelas lebih
+    // horizontal daripada vertikal (biar nggak ke-trigger pas orang
+    // scroll biasa), dan jaraknya cukup jauh (bukan cuma nge-tap).
+    if (Math.abs(deltaX) < 60 || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) {
+      return;
+    }
+
+    const langkahAktifSaatIni = document.querySelector(".langkah.aktif");
+    if (!langkahAktifSaatIni) return;
+
+    const indexSekarang = urutanLangkah.indexOf(langkahAktifSaatIni.id);
+    if (indexSekarang === -1) return;
+
+    if (deltaX < 0 && indexSekarang < urutanLangkah.length - 1) {
+      pindahKe(urutanLangkah[indexSekarang + 1]);
+    } else if (deltaX > 0 && indexSekarang > 0) {
+      pindahKe(urutanLangkah[indexSekarang - 1]);
+    }
+  },
+  { passive: true }
+);
