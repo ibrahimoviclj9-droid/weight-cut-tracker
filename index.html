@@ -59,13 +59,6 @@
     <button type="button" class="satuan-btn" data-satuan="lb">LB</button>
   </div>
 
-  <div class="pengingat-box">
-    <label for="jamPengingat"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2" /><path d="M5 3 2 6" /><path d="m22 6-3-3" /><path d="M6.38 18.7 4 21" /><path d="M17.64 18.67 20 21" /></svg> Jam pengingat harian:</label>
-    <input type="time" id="jamPengingat">
-    <button type="button" id="btnAktifkanPush"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></svg> Aktifkan Notifikasi</button>
-    <p id="statusPengingat" class="pesan"></p>
-  </div>
-
   <nav class="nav-langkah">
     <button type="button" class="nav-btn aktif" data-tujuan="langkah-profil">
       <svg class="icon-tab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
@@ -88,6 +81,13 @@
   <div class="langkah-container">
   <section id="langkah-profil" class="langkah aktif">
     <p>Lengkapi profil Anda terlebih dahulu sebelum memulai pelacakan weight cut.</p>
+
+    <div class="pengingat-box">
+      <label for="jamPengingat"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2" /><path d="M5 3 2 6" /><path d="m22 6-3-3" /><path d="M6.38 18.7 4 21" /><path d="M17.64 18.67 20 21" /></svg> Jam pengingat harian:</label>
+      <input type="time" id="jamPengingat">
+      <button type="button" id="btnAktifkanPush"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></svg> Aktifkan Notifikasi</button>
+      <p id="statusPengingat" class="pesan"></p>
+    </div>
 
     <form id="profilForm">
       <label for="nama">Nama:</label>

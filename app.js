@@ -332,10 +332,15 @@ const semuaBtnLanjut = document.querySelectorAll(".btn-lanjut");
 // Urutan tab dipakai buat deteksi arah geser (kiri atau kanan)
 const urutanTab = ["langkah-profil", "langkah-target", "langkah-harian", "langkah-ringkasan"];
 
-// Semua kelas yang mungkin nempel di .langkah - dibersihkan sebelum transisi
+// Semua kelas geser yang mungkin nempel di .langkah
 const kelasGeser = ["aktif", "dari-kanan", "dari-kiri", "keluar-ke-kiri", "keluar-ke-kanan"];
 
-function pindahKe(idTujuan) {
+const langkahContainer = document.querySelector(".langkah-container");
+
+// Pindah tab dengan mode tertentu:
+// mode "tap"   = langsung muncul tanpa animasi (klik tab bar)
+// mode "swipe" = animasi geser ala WhatsApp (dari swipe jari)
+function pindahKe(idTujuan, mode) {
   const langkahAktif = document.querySelector(".langkah.aktif");
   const langkahTujuan = document.getElementById(idTujuan);
 
@@ -350,43 +355,57 @@ function pindahKe(idTujuan) {
     btn.classList.toggle("aktif", btn.dataset.tujuan === idTujuan);
   });
 
-  // 1. Posisikan langkah tujuan di luar layar (TANPA transition dulu)
-  //    Caranya: hapus semua kelas geser dulu, lalu pasang posisi awal
-  kelasGeser.forEach(function (k) { langkahTujuan.classList.remove(k); });
-  langkahTujuan.classList.add(geserKanan ? "dari-kanan" : "dari-kiri");
+  if (mode === "swipe") {
+    // --- Mode swipe: animasi geser penuh kiri/kanan ala WhatsApp ---
+    langkahContainer.setAttribute("data-animasi", "geser");
 
-  // 2. Paksa browser "menggambar" posisi awal itu dulu sebelum transition
-  //    dimulai. Tanpa ini, browser mungkin skip ke posisi akhir (blink).
-  //    void langkahTujuan.offsetWidth adalah cara standar untuk flush layout.
-  void langkahTujuan.offsetWidth;
+    // 1. Posisikan langkah tujuan di luar layar
+    kelasGeser.forEach(function (k) { langkahTujuan.classList.remove(k); });
+    langkahTujuan.classList.add(geserKanan ? "dari-kanan" : "dari-kiri");
 
-  // 3. Sekarang aktifkan langkah tujuan (transition jalan otomatis ke translateX(0))
-  //    dan geser langkah lama keluar
-  langkahAktif.classList.remove("aktif");
-  langkahAktif.classList.add(geserKanan ? "keluar-ke-kiri" : "keluar-ke-kanan");
-  langkahTujuan.classList.remove("dari-kanan", "dari-kiri");
-  langkahTujuan.classList.add("aktif");
+    // 2. Flush layout biar browser gambar posisi awal sebelum transition
+    void langkahTujuan.offsetWidth;
 
-  // 4. Bersihkan kelas keluar setelah animasi selesai (sedikit lebih lama
-  //    dari durasi CSS 0.35s biar nggak kepotong di device lambat)
-  setTimeout(function () {
-    langkahAktif.classList.remove("keluar-ke-kiri", "keluar-ke-kanan");
-  }, 400);
+    // 3. Jalankan animasi
+    langkahAktif.classList.remove("aktif");
+    langkahAktif.classList.add(geserKanan ? "keluar-ke-kiri" : "keluar-ke-kanan");
+    langkahTujuan.classList.remove("dari-kanan", "dari-kiri");
+    langkahTujuan.classList.add("aktif");
+
+    // 4. Bersihkan setelah animasi selesai (~280ms + buffer)
+    setTimeout(function () {
+      langkahAktif.classList.remove("keluar-ke-kiri", "keluar-ke-kanan");
+      langkahContainer.removeAttribute("data-animasi");
+    }, 350);
+
+  } else {
+    // --- Mode tap: langsung muncul tanpa animasi ---
+    // Pastikan data-animasi tidak ada (tidak ada transition yang aktif)
+    langkahContainer.removeAttribute("data-animasi");
+    kelasGeser.forEach(function (k) {
+      langkahAktif.classList.remove(k);
+      langkahTujuan.classList.remove(k);
+    });
+    langkahAktif.classList.remove("aktif");
+    langkahTujuan.classList.add("aktif");
+  }
 
   if (idTujuan === "langkah-ringkasan") {
     tampilkanRingkasan();
   }
 }
 
+// Tab bar: tap langsung muncul tanpa animasi (persis kayak WhatsApp)
 semuaNavBtn.forEach(function (btn) {
   btn.addEventListener("click", function () {
-    pindahKe(btn.dataset.tujuan);
+    pindahKe(btn.dataset.tujuan, "tap");
   });
 });
 
+// Tombol "Lanjut ke...": pakai animasi geser karena ini navigasi berurutan
 semuaBtnLanjut.forEach(function (btn) {
   btn.addEventListener("click", function () {
-    pindahKe(btn.dataset.tujuan);
+    pindahKe(btn.dataset.tujuan, "swipe");
   });
 });
 
@@ -935,9 +954,9 @@ document.addEventListener(
     if (indexSekarang === -1) return;
 
     if (deltaX < 0 && indexSekarang < urutanTab.length - 1) {
-      pindahKe(urutanTab[indexSekarang + 1]);
+      pindahKe(urutanTab[indexSekarang + 1], "swipe");
     } else if (deltaX > 0 && indexSekarang > 0) {
-      pindahKe(urutanTab[indexSekarang - 1]);
+      pindahKe(urutanTab[indexSekarang - 1], "swipe");
     }
   },
   { passive: true }

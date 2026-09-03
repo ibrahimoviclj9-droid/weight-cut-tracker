@@ -336,7 +336,9 @@ textarea:focus-visible {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 14px;
-  margin-bottom: 24px;
+  margin-top: 0;
+  margin-bottom: 16px;
+  width: 100%;
   padding: 18px 20px;
   background-color: var(--surface);
   border: 1px solid var(--border);
@@ -474,56 +476,67 @@ textarea:focus-visible {
   overflow: hidden;
 }
 
-/* Semua langkah selalu ada di DOM (tidak display:none), hanya digeser
-   keluar layar pakai translateX. Ini kunci supaya animasi mulus - tidak
-   ada elemen yang tiba-tiba muncul/hilang di tengah animasi. */
+/* Semua langkah selalu ada di DOM (tidak display:none), ditumpuk pakai
+   position absolute. Yang non-aktif disembunyikan di luar layar.
+   Animasi ada 2 mode:
+   - swipe (data-animasi="geser"): geser penuh kiri/kanan ala WhatsApp
+   - tap tab (default): langsung muncul tanpa animasi */
 .langkah {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  /* Langkah non-aktif disembunyikan ke kanan, siap digeser masuk */
-  transform: translateX(110%);
-  /* Langkah non-aktif tidak boleh bisa diklik/di-tab */
   visibility: hidden;
-  /* pointer-events off biar nggak bisa klik konten yang lagi "di balik layar" */
   pointer-events: none;
-  /* Posisi absolute biar semua langkah tumpuk di titik yang sama,
-     tinggi container ditentukan oleh langkah yang .aktif (position:relative) */
   position: absolute;
   top: 0;
   left: 0;
+  /* Default: sembunyikan ke kanan tanpa animasi */
+  transform: translateX(100%);
+  opacity: 0;
 }
 
-/* Langkah aktif: kembali ke posisi normal, bisa diklik */
+/* Langkah aktif: tampil normal */
 .langkah.aktif {
   position: relative;
   transform: translateX(0);
+  opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Kelas ini dipasang JS sebelum pindah: tandai arah datang dari mana.
-   Langkah baru yang akan masuk dari kanan dimulai dari posisi +110%.
-   Langkah baru yang akan masuk dari kiri dimulai dari posisi -110%. */
-.langkah.dari-kanan {
-  transform: translateX(110%);
+/* --- Mode SWIPE (animasi geser ala WhatsApp) --- */
+/* Hanya aktif kalau .langkah-container punya data-animasi="geser" */
+
+/* Langkah baru yang akan masuk dari kanan (geser swipe kiri) */
+.langkah-container[data-animasi="geser"] .langkah.dari-kanan {
+  transform: translateX(100%);
+  opacity: 1;
 }
 
-.langkah.dari-kiri {
-  transform: translateX(-110%);
+/* Langkah baru yang akan masuk dari kiri (geser swipe kanan) */
+.langkah-container[data-animasi="geser"] .langkah.dari-kiri {
+  transform: translateX(-100%);
+  opacity: 1;
 }
 
-/* Langkah lama yang keluar: diberi transition supaya gesernya mulus */
-.langkah.keluar-ke-kiri {
-  transform: translateX(-110%);
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+/* Langkah aktif saat dalam mode geser: aktifkan transition */
+.langkah-container[data-animasi="geser"] .langkah.aktif {
+  transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.langkah.keluar-ke-kanan {
-  transform: translateX(110%);
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+/* Langkah lama yang keluar ke kiri */
+.langkah-container[data-animasi="geser"] .langkah.keluar-ke-kiri {
+  transform: translateX(-100%);
+  opacity: 1;
+  transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Langkah lama yang keluar ke kanan */
+.langkah-container[data-animasi="geser"] .langkah.keluar-ke-kanan {
+  transform: translateX(100%);
+  opacity: 1;
+  transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 @keyframes masukLangkah {
