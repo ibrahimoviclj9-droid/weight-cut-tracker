@@ -332,43 +332,46 @@ const semuaBtnLanjut = document.querySelectorAll(".btn-lanjut");
 // Urutan tab dipakai buat deteksi arah geser (kiri atau kanan)
 const urutanTab = ["langkah-profil", "langkah-target", "langkah-harian", "langkah-ringkasan"];
 
-// Kelas animasi geser - hapus semuanya sebelum pasang yang baru
-const kelasGeser = ["geser-masuk-kanan", "geser-keluar-kiri", "geser-masuk-kiri", "geser-keluar-kanan"];
+// Semua kelas yang mungkin nempel di .langkah - dibersihkan sebelum transisi
+const kelasGeser = ["aktif", "dari-kanan", "dari-kiri", "keluar-ke-kiri", "keluar-ke-kanan"];
 
 function pindahKe(idTujuan) {
   const langkahAktif = document.querySelector(".langkah.aktif");
   const langkahTujuan = document.getElementById(idTujuan);
 
-  // Kalau tujuannya sama, atau tidak ada langkah aktif, skip animasi
   if (!langkahAktif || langkahAktif === langkahTujuan) return;
 
-  // Tentukan arah: ke kanan (indeks lebih besar) atau ke kiri
   const indexAktif = urutanTab.indexOf(langkahAktif.id);
   const indexTujuan = urutanTab.indexOf(idTujuan);
   const geserKanan = indexTujuan > indexAktif;
-
-  // Bersihkan sisa kelas animasi dari geseran sebelumnya
-  semuaLangkah.forEach(function (l) {
-    kelasGeser.forEach(function (k) { l.classList.remove(k); });
-  });
 
   // Update nav tab
   semuaNavBtn.forEach(function (btn) {
     btn.classList.toggle("aktif", btn.dataset.tujuan === idTujuan);
   });
 
-  // Animasi: langkah lama keluar, langkah baru masuk
+  // 1. Posisikan langkah tujuan di luar layar (TANPA transition dulu)
+  //    Caranya: hapus semua kelas geser dulu, lalu pasang posisi awal
+  kelasGeser.forEach(function (k) { langkahTujuan.classList.remove(k); });
+  langkahTujuan.classList.add(geserKanan ? "dari-kanan" : "dari-kiri");
+
+  // 2. Paksa browser "menggambar" posisi awal itu dulu sebelum transition
+  //    dimulai. Tanpa ini, browser mungkin skip ke posisi akhir (blink).
+  //    void langkahTujuan.offsetWidth adalah cara standar untuk flush layout.
+  void langkahTujuan.offsetWidth;
+
+  // 3. Sekarang aktifkan langkah tujuan (transition jalan otomatis ke translateX(0))
+  //    dan geser langkah lama keluar
   langkahAktif.classList.remove("aktif");
-  langkahAktif.classList.add(geserKanan ? "geser-keluar-kiri" : "geser-keluar-kanan");
-
+  langkahAktif.classList.add(geserKanan ? "keluar-ke-kiri" : "keluar-ke-kanan");
+  langkahTujuan.classList.remove("dari-kanan", "dari-kiri");
   langkahTujuan.classList.add("aktif");
-  langkahTujuan.classList.add(geserKanan ? "geser-masuk-kanan" : "geser-masuk-kiri");
 
-  // Setelah animasi selesai, bersihkan kelas geser agar tidak menumpuk
+  // 4. Bersihkan kelas keluar setelah animasi selesai (sedikit lebih lama
+  //    dari durasi CSS 0.35s biar nggak kepotong di device lambat)
   setTimeout(function () {
-    langkahAktif.classList.remove("geser-keluar-kiri", "geser-keluar-kanan");
-    langkahTujuan.classList.remove("geser-masuk-kanan", "geser-masuk-kiri");
-  }, 340);
+    langkahAktif.classList.remove("keluar-ke-kiri", "keluar-ke-kanan");
+  }, 400);
 
   if (idTujuan === "langkah-ringkasan") {
     tampilkanRingkasan();
