@@ -465,15 +465,84 @@ textarea:focus-visible {
 
 /* ---------- Langkah (step) ---------- */
 
+/* Wrapper overflow-hidden biar animasi geser nggak "bocor" ke luar */
+.langkah-container {
+  position: relative;
+  width: 100%;
+  max-width: var(--contain);
+  /* min-height dicatet biar pas animasi (posisi absolute) layout nggak
+     collapse jadi 0px. Nilai 0 aman - browser tetap pakai tinggi elemen
+     aktif sebagai referensi karena .langkah.aktif masih in-flow. */
+  overflow: hidden;
+}
+
 .langkah {
   display: none;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .langkah.aktif {
   display: flex;
-  animation: masukLangkah 0.32s ease;
+}
+
+/* --- Animasi geser horizontal --- */
+
+/* Masuk dari kanan (pindah ke tab berikutnya) */
+.langkah.geser-masuk-kanan {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: masukDariKanan 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Keluar ke kiri (tab lama waktu pindah ke kanan) */
+.langkah.geser-keluar-kiri {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: keluarKeKiri 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Masuk dari kiri (pindah ke tab sebelumnya) */
+.langkah.geser-masuk-kiri {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: masukDariKiri 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Keluar ke kanan (tab lama waktu pindah ke kiri) */
+.langkah.geser-keluar-kanan {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: keluarKeKanan 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes masukDariKanan {
+  from { transform: translateX(100%); opacity: 0.6; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes keluarKeKiri {
+  from { transform: translateX(0);     opacity: 1; }
+  to   { transform: translateX(-100%); opacity: 0.6; }
+}
+
+@keyframes masukDariKiri {
+  from { transform: translateX(-100%); opacity: 0.6; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes keluarKeKanan {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(100%); opacity: 0.6; }
 }
 
 @keyframes masukLangkah {

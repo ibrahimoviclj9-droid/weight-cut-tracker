@@ -329,15 +329,46 @@ const semuaLangkah = document.querySelectorAll(".langkah");
 const semuaNavBtn = document.querySelectorAll(".nav-btn");
 const semuaBtnLanjut = document.querySelectorAll(".btn-lanjut");
 
-function pindahKe(idTujuan) {
-  semuaLangkah.forEach(function (langkah) {
-    langkah.classList.remove("aktif");
-  });
-  document.getElementById(idTujuan).classList.add("aktif");
+// Urutan tab dipakai buat deteksi arah geser (kiri atau kanan)
+const urutanTab = ["langkah-profil", "langkah-target", "langkah-harian", "langkah-ringkasan"];
 
+// Kelas animasi geser - hapus semuanya sebelum pasang yang baru
+const kelasGeser = ["geser-masuk-kanan", "geser-keluar-kiri", "geser-masuk-kiri", "geser-keluar-kanan"];
+
+function pindahKe(idTujuan) {
+  const langkahAktif = document.querySelector(".langkah.aktif");
+  const langkahTujuan = document.getElementById(idTujuan);
+
+  // Kalau tujuannya sama, atau tidak ada langkah aktif, skip animasi
+  if (!langkahAktif || langkahAktif === langkahTujuan) return;
+
+  // Tentukan arah: ke kanan (indeks lebih besar) atau ke kiri
+  const indexAktif = urutanTab.indexOf(langkahAktif.id);
+  const indexTujuan = urutanTab.indexOf(idTujuan);
+  const geserKanan = indexTujuan > indexAktif;
+
+  // Bersihkan sisa kelas animasi dari geseran sebelumnya
+  semuaLangkah.forEach(function (l) {
+    kelasGeser.forEach(function (k) { l.classList.remove(k); });
+  });
+
+  // Update nav tab
   semuaNavBtn.forEach(function (btn) {
     btn.classList.toggle("aktif", btn.dataset.tujuan === idTujuan);
   });
+
+  // Animasi: langkah lama keluar, langkah baru masuk
+  langkahAktif.classList.remove("aktif");
+  langkahAktif.classList.add(geserKanan ? "geser-keluar-kiri" : "geser-keluar-kanan");
+
+  langkahTujuan.classList.add("aktif");
+  langkahTujuan.classList.add(geserKanan ? "geser-masuk-kanan" : "geser-masuk-kiri");
+
+  // Setelah animasi selesai, bersihkan kelas geser agar tidak menumpuk
+  setTimeout(function () {
+    langkahAktif.classList.remove("geser-keluar-kiri", "geser-keluar-kanan");
+    langkahTujuan.classList.remove("geser-masuk-kanan", "geser-masuk-kiri");
+  }, 340);
 
   if (idTujuan === "langkah-ringkasan") {
     tampilkanRingkasan();
@@ -867,7 +898,8 @@ document.addEventListener("click", function (event) {
 
 /* ---------- Swipe Kiri/Kanan Buat Pindah Tab ---------- */
 
-const urutanLangkah = ["langkah-profil", "langkah-target", "langkah-harian", "langkah-ringkasan"];
+// urutanLangkah dipakai di sini - pakai urutanTab yang sudah didefinisikan
+// di bagian navigasi di atas (nggak perlu didefinisikan ulang)
 let touchStartX = 0;
 let touchStartY = 0;
 
@@ -896,13 +928,13 @@ document.addEventListener(
     const langkahAktifSaatIni = document.querySelector(".langkah.aktif");
     if (!langkahAktifSaatIni) return;
 
-    const indexSekarang = urutanLangkah.indexOf(langkahAktifSaatIni.id);
+    const indexSekarang = urutanTab.indexOf(langkahAktifSaatIni.id);
     if (indexSekarang === -1) return;
 
-    if (deltaX < 0 && indexSekarang < urutanLangkah.length - 1) {
-      pindahKe(urutanLangkah[indexSekarang + 1]);
+    if (deltaX < 0 && indexSekarang < urutanTab.length - 1) {
+      pindahKe(urutanTab[indexSekarang + 1]);
     } else if (deltaX > 0 && indexSekarang > 0) {
-      pindahKe(urutanLangkah[indexSekarang - 1]);
+      pindahKe(urutanTab[indexSekarang - 1]);
     }
   },
   { passive: true }
