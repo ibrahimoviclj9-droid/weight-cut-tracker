@@ -985,6 +985,7 @@ function snapSelesai(pindah) {
       }
 
       bersihkanDrag();
+      langkahContainer.style.overflow = "";
     }, 250);
 
   } else {
@@ -1010,6 +1011,7 @@ function snapSelesai(pindah) {
       }
 
       bersihkanDrag();
+      langkahContainer.style.overflow = "";
     }, 300);
   }
 }
@@ -1040,6 +1042,8 @@ document.addEventListener("touchstart", function (event) {
   if (indexSekarang === -1) return;
 
   dragLangkahAktif = langkahSaatIni;
+  // Buka overflow biar tetangga tidak terpotong saat drag
+  langkahContainer.style.overflow = "visible";
 
   // Siapkan tetangga kanan (kalau ada)
   if (indexSekarang < urutanTab.length - 1) {
@@ -1118,6 +1122,7 @@ document.addEventListener("touchend", function (event) {
       el.style.transform = "";
     });
     dragLangkahAktif = null;
+    langkahContainer.style.overflow = "";
     return;
   }
 
