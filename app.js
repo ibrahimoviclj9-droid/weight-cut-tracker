@@ -918,46 +918,176 @@ document.addEventListener("click", function (event) {
   }
 });
 
-/* ---------- Swipe Kiri/Kanan Buat Pindah Tab ---------- */
+/* ---------- Swipe Follow Finger (Drag to Switch Tab) ---------- */
 
-// urutanLangkah dipakai di sini - pakai urutanTab yang sudah didefinisikan
-// di bagian navigasi di atas (nggak perlu didefinisikan ulang)
-let touchStartX = 0;
-let touchStartY = 0;
+// Variabel state drag
+let dragStartX = 0;
+let dragStartY = 0;
+let dragArahTerkunci = null; // "horizontal" | "vertikal" | null
+let dragAktif = false;
+let dragLangkahAktif = null;
+let dragLangkahTarget = null; // langkah tetangga yang ikut bergerak
+let dragArah = null; // "kiri" | "kanan"
+let lebarLayar = window.innerWidth;
 
-document.addEventListener(
-  "touchstart",
-  function (event) {
-    touchStartX = event.touches[0].clientX;
-    touchStartY = event.touches[0].clientY;
-  },
-  { passive: true }
-);
+window.addEventListener("resize", function () {
+  lebarLayar = window.innerWidth;
+});
 
-document.addEventListener(
-  "touchend",
-  function (event) {
-    const deltaX = event.changedTouches[0].clientX - touchStartX;
-    const deltaY = event.changedTouches[0].clientY - touchStartY;
+// Pasang transform langsung ke elemen tanpa transition (mode drag)
+function setDragTransform(el, x) {
+  if (!el) return;
+  el.style.transition = "none";
+  el.style.transform = "translateX(" + x + "px)";
+}
 
-    // Cuma dianggap "swipe pindah tab" kalau geraknya jelas lebih
-    // horizontal daripada vertikal (biar nggak ke-trigger pas orang
-    // scroll biasa), dan jaraknya cukup jauh (bukan cuma nge-tap).
-    if (Math.abs(deltaX) < 60 || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) {
-      return;
+// Snap ke posisi akhir dengan transition mulus, lalu bersihkan
+function snapSelesai(pindah) {
+  if (!dragLangkahAktif) return;
+
+  const durasi = "0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+
+  if (pindah && dragLangkahTarget) {
+    // Commit: langkah target jadi aktif
+    const idTujuan = dragLangkahTarget.id;
+
+    dragLangkahAktif.style.transition = "transform " + durasi;
+    dragLangkahTarget.style.transition = "transform " + durasi;
+
+    dragLangkahAktif.style.transform = "translateX(" + (dragArah === "kiri" ? -lebarLayar : lebarLayar) + "px)";
+    dragLangkahTarget.style.transform = "translateX(0)";
+
+    // Update nav tab
+    semuaNavBtn.forEach(function (btn) {
+      btn.classList.toggle("aktif", btn.dataset.tujuan === idTujuan);
+    });
+
+    setTimeout(function () {
+      // Bersihkan semua style inline, pasang kelas aktif
+      dragLangkahAktif.style.transition = "";
+      dragLangkahAktif.style.transform = "";
+      dragLangkahAktif.classList.remove("aktif");
+      dragLangkahAktif.style.visibility = "";
+
+      dragLangkahTarget.style.transition = "";
+      dragLangkahTarget.style.transform = "";
+      dragLangkahTarget.classList.add("aktif");
+      dragLangkahTarget.style.visibility = "";
+      dragLangkahTarget.style.pointerEvents = "";
+
+      if (idTujuan === "langkah-ringkasan") {
+        tampilkanRingkasan();
+      }
+
+      bersihkanDrag();
+    }, 300);
+
+  } else {
+    // Batalkan: kembalikan ke posisi semula
+    dragLangkahAktif.style.transition = "transform " + durasi;
+    dragLangkahAktif.style.transform = "translateX(0)";
+
+    if (dragLangkahTarget) {
+      dragLangkahTarget.style.transition = "transform " + durasi;
+      dragLangkahTarget.style.transform = "translateX(" + (dragArah === "kiri" ? lebarLayar : -lebarLayar) + "px)";
     }
 
-    const langkahAktifSaatIni = document.querySelector(".langkah.aktif");
-    if (!langkahAktifSaatIni) return;
+    setTimeout(function () {
+      dragLangkahAktif.style.transition = "";
+      dragLangkahAktif.style.transform = "";
 
-    const indexSekarang = urutanTab.indexOf(langkahAktifSaatIni.id);
+      if (dragLangkahTarget) {
+        dragLangkahTarget.style.transition = "";
+        dragLangkahTarget.style.transform = "";
+        dragLangkahTarget.style.visibility = "";
+        dragLangkahTarget.style.pointerEvents = "";
+      }
+
+      bersihkanDrag();
+    }, 300);
+  }
+}
+
+function bersihkanDrag() {
+  dragAktif = false;
+  dragArahTerkunci = null;
+  dragLangkahAktif = null;
+  dragLangkahTarget = null;
+  dragArah = null;
+}
+
+document.addEventListener("touchstart", function (event) {
+  // Jangan mulai drag kalau lagi ada animasi
+  if (dragAktif) return;
+
+  dragStartX = event.touches[0].clientX;
+  dragStartY = event.touches[0].clientY;
+  dragArahTerkunci = null;
+  dragAktif = false;
+  dragLangkahAktif = null;
+  dragLangkahTarget = null;
+  dragArah = null;
+}, { passive: true });
+
+document.addEventListener("touchmove", function (event) {
+  const x = event.touches[0].clientX;
+  const y = event.touches[0].clientY;
+  const deltaX = x - dragStartX;
+  const deltaY = y - dragStartY;
+
+  // Kunci arah di awal gerakan
+  if (!dragArahTerkunci) {
+    if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) return;
+    dragArahTerkunci = Math.abs(deltaX) > Math.abs(deltaY) ? "horizontal" : "vertikal";
+  }
+
+  if (dragArahTerkunci !== "horizontal") return;
+
+  // Inisialisasi drag pertama kali
+  if (!dragAktif) {
+    const langkahSaatIni = document.querySelector(".langkah.aktif");
+    if (!langkahSaatIni) return;
+
+    const indexSekarang = urutanTab.indexOf(langkahSaatIni.id);
     if (indexSekarang === -1) return;
 
-    if (deltaX < 0 && indexSekarang < urutanTab.length - 1) {
-      pindahKe(urutanTab[indexSekarang + 1], "swipe");
-    } else if (deltaX > 0 && indexSekarang > 0) {
-      pindahKe(urutanTab[indexSekarang - 1], "swipe");
+    const arah = deltaX < 0 ? "kiri" : "kanan";
+    const indexTarget = arah === "kiri" ? indexSekarang + 1 : indexSekarang - 1;
+
+    if (indexTarget < 0 || indexTarget >= urutanTab.length) return;
+
+    dragAktif = true;
+    dragArah = arah;
+    dragLangkahAktif = langkahSaatIni;
+    dragLangkahTarget = document.getElementById(urutanTab[indexTarget]);
+
+    // Posisikan langkah target di sisi yang tepat, langsung tanpa animasi
+    if (dragLangkahTarget) {
+      dragLangkahTarget.style.visibility = "visible";
+      dragLangkahTarget.style.pointerEvents = "none";
+      dragLangkahTarget.style.transition = "none";
+      dragLangkahTarget.style.transform = "translateX(" + (arah === "kiri" ? lebarLayar : -lebarLayar) + "px)";
     }
-  },
-  { passive: true }
-);
+  }
+
+  if (!dragAktif) return;
+
+  // Gerakkan kedua langkah ikut jari
+  setDragTransform(dragLangkahAktif, deltaX);
+  if (dragLangkahTarget) {
+    const offsetTarget = dragArah === "kiri" ? lebarLayar + deltaX : -lebarLayar + deltaX;
+    setDragTransform(dragLangkahTarget, offsetTarget);
+  }
+
+}, { passive: true });
+
+document.addEventListener("touchend", function (event) {
+  if (!dragAktif) return;
+
+  const deltaX = event.changedTouches[0].clientX - dragStartX;
+  // Commit kalau sudah geser lebih dari 35% lebar layar
+  const threshold = lebarLayar * 0.35;
+  const pindah = Math.abs(deltaX) > threshold;
+
+  snapSelesai(pindah);
+}, { passive: true });

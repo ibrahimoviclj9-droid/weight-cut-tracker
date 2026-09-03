@@ -520,10 +520,7 @@ textarea:focus-visible {
   opacity: 1;
 }
 
-/* Langkah aktif saat dalam mode geser: aktifkan transition */
-.langkah-container[data-animasi="geser"] .langkah.aktif {
-  transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
+/* Transition di mode geser dihandle langsung oleh JS (follow finger) */
 
 /* Langkah lama yang keluar ke kiri */
 .langkah-container[data-animasi="geser"] .langkah.keluar-ke-kiri {
