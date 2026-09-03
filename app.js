@@ -945,11 +945,14 @@ function setDragTransform(el, x) {
 function snapSelesai(pindah) {
   if (!dragLangkahAktif) return;
 
-  const durasi = "0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+  const durasi = "0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
 
   if (pindah && dragLangkahTarget) {
     // Commit: langkah target jadi aktif
     const idTujuan = dragLangkahTarget.id;
+
+    // Scroll ke atas dulu biar tidak kelihatan lompat saat pindah tab
+    window.scrollTo(0, 0);
 
     dragLangkahAktif.style.transition = "transform " + durasi;
     dragLangkahTarget.style.transition = "transform " + durasi;
@@ -982,7 +985,7 @@ function snapSelesai(pindah) {
       }
 
       bersihkanDrag();
-    }, 300);
+    }, 250);
 
   } else {
     // Batalkan: kembalikan ke posisi semula
@@ -1046,6 +1049,7 @@ document.addEventListener("touchstart", function (event) {
     tetanggaKanan.style.pointerEvents = "none";
     tetanggaKanan.style.transition = "none";
     tetanggaKanan.style.transform = "translateX(" + lebarLayar + "px)";
+    tetanggaKanan.scrollTop = 0;
   }
 
   // Siapkan tetangga kiri (kalau ada)
@@ -1056,6 +1060,7 @@ document.addEventListener("touchstart", function (event) {
     tetanggaKiri.style.pointerEvents = "none";
     tetanggaKiri.style.transition = "none";
     tetanggaKiri.style.transform = "translateX(" + -lebarLayar + "px)";
+    tetanggaKiri.scrollTop = 0;
   }
 }, { passive: true });
 
