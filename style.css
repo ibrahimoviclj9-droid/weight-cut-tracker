@@ -474,6 +474,7 @@ textarea:focus-visible {
   width: 100%;
   max-width: var(--contain);
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 /* Semua langkah selalu ada di DOM (tidak display:none), ditumpuk pakai
