@@ -985,7 +985,6 @@ function snapSelesai(pindah) {
       }
 
       bersihkanDrag();
-      langkahContainer.style.overflow = "";
     }, 250);
 
   } else {
@@ -1011,7 +1010,6 @@ function snapSelesai(pindah) {
       }
 
       bersihkanDrag();
-      langkahContainer.style.overflow = "";
     }, 300);
   }
 }
@@ -1032,9 +1030,8 @@ document.addEventListener("touchstart", function (event) {
   dragArahTerkunci = null;
   dragAktif = false;
   dragArah = null;
+  dragLangkahTarget = null;
 
-  // Siapkan KEDUA tetangga langsung saat jari nempel,
-  // biar keliatan nempel di pinggir dari awal (kayak WhatsApp)
   const langkahSaatIni = document.querySelector(".langkah.aktif");
   if (!langkahSaatIni) return;
 
@@ -1042,30 +1039,6 @@ document.addEventListener("touchstart", function (event) {
   if (indexSekarang === -1) return;
 
   dragLangkahAktif = langkahSaatIni;
-  // Buka overflow biar tetangga tidak terpotong saat drag
-  langkahContainer.style.overflow = "visible";
-
-  // Siapkan tetangga kanan (kalau ada)
-  if (indexSekarang < urutanTab.length - 1) {
-    const tetanggaKanan = document.getElementById(urutanTab[indexSekarang + 1]);
-    tetanggaKanan.style.visibility = "visible";
-    tetanggaKanan.style.opacity = "1";
-    tetanggaKanan.style.pointerEvents = "none";
-    tetanggaKanan.style.transition = "none";
-    tetanggaKanan.style.transform = "translateX(" + lebarLayar + "px)";
-    tetanggaKanan.scrollTop = 0;
-  }
-
-  // Siapkan tetangga kiri (kalau ada)
-  if (indexSekarang > 0) {
-    const tetanggaKiri = document.getElementById(urutanTab[indexSekarang - 1]);
-    tetanggaKiri.style.visibility = "visible";
-    tetanggaKiri.style.opacity = "1";
-    tetanggaKiri.style.pointerEvents = "none";
-    tetanggaKiri.style.transition = "none";
-    tetanggaKiri.style.transform = "translateX(" + -lebarLayar + "px)";
-    tetanggaKiri.scrollTop = 0;
-  }
 }, { passive: true });
 
 document.addEventListener("touchmove", function (event) {
@@ -1076,14 +1049,15 @@ document.addEventListener("touchmove", function (event) {
 
   // Kunci arah di awal gerakan
   if (!dragArahTerkunci) {
-    if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) return;
+    if (Math.abs(deltaX) < 8 && Math.abs(deltaY) < 8) return;
     dragArahTerkunci = Math.abs(deltaX) > Math.abs(deltaY) ? "horizontal" : "vertikal";
   }
 
   if (dragArahTerkunci !== "horizontal") return;
 
-  // Set langkah target sesuai arah (sekali aja)
+  // Inisialisasi drag pertama kali (arah sudah pasti horizontal)
   if (!dragAktif) {
+    if (!dragLangkahAktif) return;
     const indexSekarang = urutanTab.indexOf(dragLangkahAktif.id);
     const arah = deltaX < 0 ? "kiri" : "kanan";
     const indexTarget = arah === "kiri" ? indexSekarang + 1 : indexSekarang - 1;
@@ -1093,6 +1067,18 @@ document.addEventListener("touchmove", function (event) {
     dragAktif = true;
     dragArah = arah;
     dragLangkahTarget = document.getElementById(urutanTab[indexTarget]);
+
+    // Siapkan tetangga: posisi awal di luar layar, langsung visible
+    if (dragLangkahTarget) {
+      dragLangkahTarget.style.transition = "none";
+      dragLangkahTarget.style.transform = "translateX(" + (arah === "kiri" ? lebarLayar : -lebarLayar) + "px)";
+      dragLangkahTarget.style.visibility = "visible";
+      dragLangkahTarget.style.opacity = "1";
+      dragLangkahTarget.style.pointerEvents = "none";
+      dragLangkahTarget.scrollTop = 0;
+      // Flush layout biar posisi awal tergambar sebelum ikut jari
+      void dragLangkahTarget.offsetWidth;
+    }
   }
 
   if (!dragAktif) return;
@@ -1110,19 +1096,8 @@ document.addEventListener("touchend", function (event) {
   if (!dragLangkahAktif) return;
 
   if (!dragAktif) {
-    // Jari diangkat tanpa drag horizontal - bersihkan tetangga yang sudah disiapkan
-    const indexSekarang = urutanTab.indexOf(dragLangkahAktif.id);
-    [indexSekarang - 1, indexSekarang + 1].forEach(function (i) {
-      if (i < 0 || i >= urutanTab.length) return;
-      const el = document.getElementById(urutanTab[i]);
-      el.style.visibility = "";
-      el.style.opacity = "";
-      el.style.pointerEvents = "";
-      el.style.transition = "";
-      el.style.transform = "";
-    });
+    // Jari diangkat tanpa drag horizontal - tidak ada yang perlu dibersihkan
     dragLangkahAktif = null;
-    langkahContainer.style.overflow = "";
     return;
   }
 
